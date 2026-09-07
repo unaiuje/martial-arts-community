@@ -7,11 +7,17 @@ import type { Database } from "@/integrations/supabase/types";
  * Server-only privileged work (cron, admin) would still live in createServerFn.
  */
 
-export type FeedItem = Database["public"]["Functions"]["get_feed"]["Returns"][number];
+export type FeedItem = Database["public"]["Functions"]["get_feed_v2"]["Returns"][number];
 export type CommentRow = Database["public"]["Tables"]["post_comments"]["Row"];
 export type PostRow = Database["public"]["Tables"]["posts"]["Row"];
 
 export const FEED_PAGE_SIZE = 6;
+
+/** Keyset cursor: ranking is by (score, created_at), so paging must be too. */
+export interface FeedCursor {
+  score: number;
+  createdAt: string;
+}
 
 function isDuplicate(msg: string | undefined | null) {
   return !!msg && /duplicate|unique/i.test(msg);
@@ -23,14 +29,22 @@ async function requireUserId(): Promise<string> {
   return data.user.id;
 }
 
-export async function fetchFeedPage(cursor: string | null): Promise<FeedItem[]> {
-  const { data, error } = await supabase.rpc("get_feed", {
-    p_cursor: (cursor ?? null) as unknown as string,
+export async function fetchFeedPage(cursor: FeedCursor | null): Promise<FeedItem[]> {
+  const { data, error } = await supabase.rpc("get_feed_v2", {
+    p_cursor_score: cursor ? cursor.score : undefined,
+    p_cursor: cursor ? cursor.createdAt : undefined,
     p_limit: FEED_PAGE_SIZE,
   });
   if (error) throw new Error(error.message);
-  return (data ?? []) as FeedItem[];
+  // Defensive: the ranking function is public-only, never surface private posts.
+  return ((data ?? []) as FeedItem[]).filter((p) => p.visibility === "public");
 }
+
+export function feedCursorOf(item: FeedItem | undefined): FeedCursor | undefined {
+  if (!item || item.score == null || !item.created_at) return undefined;
+  return { score: item.score, createdAt: item.created_at };
+}
+
 
 export async function fetchMyLikedSet(postIds: string[]): Promise<Set<string>> {
   if (!postIds.length) return new Set();
