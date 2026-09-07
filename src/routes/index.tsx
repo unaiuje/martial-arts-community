@@ -532,6 +532,7 @@ function FeedCard({
             {!isAuthed && (
               <Link
                 to="/auth"
+                search={{ redirect: "/" }}
                 className="inline-block text-[10px] font-mono uppercase tracking-widest text-accent underline"
               >
                 Sign in to like, comment & follow
