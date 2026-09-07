@@ -120,7 +120,7 @@ function ProfilePage() {
     await supabase.auth.signOut();
     auth.signOut();
     toast.success("Signed out");
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/auth", search: { redirect: "/" }, replace: true });
   }
 
   return (

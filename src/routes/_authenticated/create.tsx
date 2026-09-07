@@ -27,6 +27,7 @@ import {
   Scissors,
 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError, describeError } from "@/lib/errors";
 import { MobileShell } from "@/components/MobileShell";
 import {
   Sheet,
@@ -402,13 +403,13 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           : "Video uploaded",
       );
     } catch (e) {
-      const err = e as Error;
       const msg =
         e instanceof VideoValidationError
-          ? err.message
-          : err.message || "Could not upload video — please try again.";
+          ? e.message
+          : describeError(e, "Could not upload video — please try again.");
       setVideoError(msg);
-      toast.error(msg);
+      if (e instanceof VideoValidationError) toast.error(msg);
+      else toastError(e, "video_upload", "Could not upload video — please try again.");
       setVideoFile(null);
       setVideoUpload(null);
       if (localUrl) URL.revokeObjectURL(localUrl);
@@ -479,7 +480,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
       setPosterUpload(result);
       toast.success("Cover saved");
     } catch (e) {
-      toast.error((e as Error).message || "Could not save cover");
+      toastError(e, "cover_upload", "Could not save the cover image");
     } finally {
       setPosterUploading(false);
     }
@@ -523,7 +524,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
       toast.success("Video published to your feed");
       onClose();
     } catch (e) {
-      toast.error((e as Error).message || "Could not publish");
+      toastError(e, "post_publish", "Could not publish your video");
     } finally {
       setPublishing(false);
     }
@@ -995,7 +996,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
       setSide((s) => ({ ...s, upload: result, uploading: false, progress: 1 }));
       toast.success(`Fighter ${side.toUpperCase()} image uploaded`);
     } catch (err) {
-      toast.error((err as Error).message || "Could not upload image");
+      toastError(err, "duel_image_upload", "Could not upload the image");
       setSide({ local: "", upload: null, progress: 0, uploading: false });
     }
   };
@@ -1037,7 +1038,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
       toast.success("Duel started — voting is live");
       onClose();
     } catch (e) {
-      toast.error((e as Error).message || "Could not start duel");
+      toastError(e, "duel_create", "Could not start the duel");
     } finally {
       setPublishing(false);
     }

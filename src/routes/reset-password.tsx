@@ -86,6 +86,7 @@ function ResetPasswordPage() {
           <p className="text-sm text-muted-foreground">{t("reset.invalidLink")}</p>
           <Link
             to="/auth"
+            search={{ redirect: "/" }}
             className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-accent text-accent-foreground font-bold uppercase tracking-wide text-sm"
           >
             {t("auth.signIn")}

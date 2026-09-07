@@ -26,11 +26,14 @@ import { formatCount } from "@/lib/mock-data";
 import { actions, useStore } from "@/lib/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { toastError } from "@/lib/errors";
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import {
   FEED_PAGE_SIZE,
   fetchFeedPage,
+  feedCursorOf,
+  type FeedCursor,
   fetchMyLikedSet,
   fetchMyFollowingSet,
   toggleLike as apiToggleLike,
@@ -61,10 +64,11 @@ function FeedPage() {
   // Paginated feed with cursor by created_at, ranked by affinity on the server.
   const feedQ = useInfiniteQuery({
     queryKey: ["feed", "infinite", authUser?.id ?? "anon"],
-    queryFn: ({ pageParam }) => fetchFeedPage(pageParam as string | null),
-    initialPageParam: null as string | null,
+    queryFn: ({ pageParam }) => fetchFeedPage(pageParam as FeedCursor | null),
+    initialPageParam: null as FeedCursor | null,
     getNextPageParam: (last) =>
-      last.length < FEED_PAGE_SIZE ? undefined : last[last.length - 1]?.created_at ?? undefined,
+      last.length < FEED_PAGE_SIZE ? undefined : feedCursorOf(last[last.length - 1]),
+
     staleTime: 30_000,
     enabled: online,
     networkMode: "offlineFirst",
@@ -183,7 +187,12 @@ function FeedPage() {
       if (ctx?.key) queryClient.setQueryData(ctx.key, ctx.prev);
       const msg = (err as Error).message;
       if (msg === "AUTH_REQUIRED") toast.error("Sign in to like posts");
-      else toast.error(msg || "Could not like");
+      else toastError(err, "feed_like", "Could not like");
+    },
+    onSuccess: () => {
+      // Liking changes art affinity → mark the ranked feed stale without
+      // yanking the current scroll position; it re-ranks on next entry.
+      queryClient.invalidateQueries({ queryKey: ["feed", "infinite"], refetchType: "none" });
     },
   });
 
@@ -204,7 +213,7 @@ function FeedPage() {
       if (ctx?.key) queryClient.setQueryData(ctx.key, ctx.prev);
       const msg = (err as Error).message;
       if (msg === "AUTH_REQUIRED") toast.error("Sign in to follow");
-      else toast.error(msg || "Could not follow");
+      else toastError(err, "feed_follow", "Could not follow");
     },
   });
 
@@ -523,6 +532,7 @@ function FeedCard({
             {!isAuthed && (
               <Link
                 to="/auth"
+                search={{ redirect: "/" }}
                 className="inline-block text-[10px] font-mono uppercase tracking-widest text-accent underline"
               >
                 Sign in to like, comment & follow
@@ -625,7 +635,7 @@ function CommentsSheet({
     onError: (err) => {
       const msg = (err as Error).message;
       if (msg === "AUTH_REQUIRED") toast.error("Sign in to comment");
-      else toast.error(msg || "Could not comment");
+      else toastError(err, "comment_add", "Could not post your comment");
     },
   });
 
@@ -635,7 +645,7 @@ function CommentsSheet({
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["feed", "infinite"] });
     },
-    onError: (err) => toast.error((err as Error).message || "Could not delete"),
+    onError: (err) => toastError(err, "comment_delete", "Could not delete the comment"),
   });
 
   const likeMut = useMutation({
