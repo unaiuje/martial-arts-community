@@ -114,7 +114,11 @@ export async function fetchBackendFeed(): Promise<BackendFeed> {
   ]);
   if (postsRes.error) throw new Error(postsRes.error.message);
   if (duelsRes.error) throw new Error(duelsRes.error.message);
-  const posts: FeedPost[] = (postsRes.data ?? []).map((r: Record<string, unknown>) => ({
+  const posts: FeedPost[] = (postsRes.data ?? [])
+    // Private posts are visible to their owner through RLS, but this store
+    // backs public surfaces (search, discovery) — never leak them there.
+    .filter((r: Record<string, unknown>) => (r.visibility ?? "public") === "public")
+    .map((r: Record<string, unknown>) => ({
       id: String(r.id),
       handle: String(r.handle),
       meta: "You",
