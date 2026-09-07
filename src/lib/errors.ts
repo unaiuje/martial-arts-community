@@ -33,15 +33,12 @@ export function describeError(err: unknown, fallback = "Something went wrong"): 
 /** Toast an error with a consistent message and a traceable incident id. */
 export function toastError(err: unknown, context: string, fallback?: string): string {
   const message = describeError(err, fallback);
-  const inc = logIncident({
-    message: `${context}: ${message}`,
-    route: typeof window !== "undefined" ? window.location.pathname : context,
-  });
-  const id = typeof inc === "string" ? inc : (inc as { id?: string } | undefined)?.id;
+  const record = logIncident(err, { source: context, message });
   reportLovableError(err, { source: context }, { handled: true });
-  toast.error(message, id ? { description: `Ref ${id}` } : undefined);
+  toast.error(message, { description: `Ref ${record.id}` });
   return message;
 }
+
 
 /** Run an async backend call with loading/success/error toasts. */
 export async function withToast<T>(
