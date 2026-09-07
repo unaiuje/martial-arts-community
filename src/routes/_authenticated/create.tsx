@@ -403,13 +403,13 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           : "Video uploaded",
       );
     } catch (e) {
-      const err = e as Error;
       const msg =
         e instanceof VideoValidationError
-          ? err.message
-          : err.message || "Could not upload video — please try again.";
+          ? e.message
+          : describeError(e, "Could not upload video — please try again.");
       setVideoError(msg);
-      toast.error(msg);
+      if (e instanceof VideoValidationError) toast.error(msg);
+      else toastError(e, "video_upload", "Could not upload video — please try again.");
       setVideoFile(null);
       setVideoUpload(null);
       if (localUrl) URL.revokeObjectURL(localUrl);
