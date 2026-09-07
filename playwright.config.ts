@@ -11,5 +11,10 @@ export default defineConfig({
     baseURL: process.env["E2E_BASE_URL"] ?? "http://localhost:8080",
     trace: "off",
     ...devices["Pixel 7"],
+    launchOptions: {
+      executablePath:
+        process.env["PLAYWRIGHT_CHROMIUM_PATH"] ??
+        "/opt/ms-playwright/chromium-1194/chrome-linux/chrome",
+    },
   },
 });
