@@ -61,10 +61,11 @@ function FeedPage() {
   // Paginated feed with cursor by created_at, ranked by affinity on the server.
   const feedQ = useInfiniteQuery({
     queryKey: ["feed", "infinite", authUser?.id ?? "anon"],
-    queryFn: ({ pageParam }) => fetchFeedPage(pageParam as string | null),
-    initialPageParam: null as string | null,
+    queryFn: ({ pageParam }) => fetchFeedPage(pageParam as FeedCursor | null),
+    initialPageParam: null as FeedCursor | null,
     getNextPageParam: (last) =>
-      last.length < FEED_PAGE_SIZE ? undefined : last[last.length - 1]?.created_at ?? undefined,
+      last.length < FEED_PAGE_SIZE ? undefined : feedCursorOf(last[last.length - 1]),
+
     staleTime: 30_000,
     enabled: online,
     networkMode: "offlineFirst",
