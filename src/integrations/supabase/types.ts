@@ -445,6 +445,25 @@ export type Database = {
           visibility: string
         }[]
       }
+      get_feed_v2: {
+        Args: { p_cursor?: string; p_cursor_score?: number; p_limit?: number }
+        Returns: {
+          art: string
+          caption: string
+          comments: number
+          created_at: string
+          handle: string
+          id: string
+          level: string
+          likes: number
+          poster: string
+          score: number
+          tags: string[]
+          user_id: string
+          video: string
+          visibility: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

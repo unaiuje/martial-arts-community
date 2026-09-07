@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788788106974,
+      "tag": "0000_get_feed_v2_public_only_keyset",
+      "breakpoints": true
+    }
+  ]
+}
