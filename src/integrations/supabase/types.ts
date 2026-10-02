@@ -297,30 +297,42 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          coach_arts: string[]
+          coach_location: string | null
+          coach_schedule: string | null
           created_at: string
           display_name: string | null
           handle: string
           id: string
+          is_coach: boolean
           primary_art: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          coach_arts?: string[]
+          coach_location?: string | null
+          coach_schedule?: string | null
           created_at?: string
           display_name?: string | null
           handle: string
           id: string
+          is_coach?: boolean
           primary_art?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          coach_arts?: string[]
+          coach_location?: string | null
+          coach_schedule?: string | null
           created_at?: string
           display_name?: string | null
           handle?: string
           id?: string
+          is_coach?: boolean
           primary_art?: string | null
           updated_at?: string
         }

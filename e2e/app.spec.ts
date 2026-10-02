@@ -24,19 +24,25 @@ test.describe("public routes", () => {
     expect(res?.status()).toBeLessThan(400);
     await expect(page.locator("body")).toBeVisible();
     // Either content, skeletons or the empty state — never a blank error page.
-    await expect(page.locator("main, [data-feed-card], text=/for you|no videos|sign in/i").first()).toBeVisible();
+    await expect(page.locator("main").first()).toBeVisible();
   });
 
   test("search page lists BJJ technique categories", async ({ page }) => {
     await page.goto("/search", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: /search/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
     await page.getByRole("button", { name: /bjj techniques/i }).click();
-    await expect(page.getByText(/categories/i).first()).toBeVisible();
+    await expect(page.getByText("Categories", { exact: true })).toBeVisible({ timeout: 15_000 });
   });
 
   test("search never shows private videos", async ({ page }) => {
     await page.goto("/search", { waitUntil: "domcontentloaded" });
     await expect(page.getByText(/private/i)).toHaveCount(0);
+  });
+
+  test("public profile page renders without sign in", async ({ page }) => {
+    const res = await page.goto("/u/nonexistent_e2e_user", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBeLessThan(400);
+    await expect(page.getByText(/not found/i)).toBeVisible({ timeout: 15_000 });
   });
 
   test("duels page loads", async ({ page }) => {
@@ -55,8 +61,8 @@ test.describe("public routes", () => {
     await page.goto("/auth", { waitUntil: "domcontentloaded" });
     await page.locator('input[type="email"]').fill("nobody+e2e@example.com");
     await page.locator('input[type="password"]').fill("wrong-password-123");
-    await page.getByRole("button", { name: /sign in|entrar|iniciar/i }).first().click();
-    await expect(page.locator("body")).toContainText(/invalid|incorrect|credenc|error/i, {
+    await page.locator('form button[type="submit"]').click();
+    await expect(page.getByRole("alert").first()).toContainText(/wrong email or password|incorrect/i, {
       timeout: 15_000,
     });
   });
@@ -82,7 +88,7 @@ test.describe("authenticated flows", () => {
     await page.goto("/auth", { waitUntil: "domcontentloaded" });
     await page.locator('input[type="email"]').fill(email!);
     await page.locator('input[type="password"]').fill(password!);
-    await page.getByRole("button", { name: /sign in|entrar|iniciar/i }).first().click();
+    await page.locator('form button[type="submit"]').click();
     await page.waitForURL((u) => !u.pathname.startsWith("/auth"), { timeout: 20_000 });
   }
 

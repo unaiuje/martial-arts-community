@@ -8,6 +8,13 @@
       "when": 1788788106974,
       "tag": "0000_get_feed_v2_public_only_keyset",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790957749840,
+      "tag": "0001_coach_profiles",
+      "breakpoints": true
     }
   ]
 }

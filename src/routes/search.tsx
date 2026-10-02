@@ -6,6 +6,7 @@ import { MobileShell } from "@/components/MobileShell";
 import { ARTS, formatCount } from "@/lib/mock-data";
 import { useStore } from "@/lib/store";
 import { fetchAllTechniques, fetchCategories } from "@/lib/techniques";
+import { fetchCoaches } from "@/lib/public-profile";
 
 export const Route = createFileRoute("/search")({
   head: () => ({
@@ -45,6 +46,11 @@ function SearchPage() {
   const techniquesQ = useQuery({
     queryKey: ["all-techniques", "bjj"],
     queryFn: () => fetchAllTechniques("bjj"),
+    enabled: tab === "techniques",
+  });
+  const coachesQ = useQuery({
+    queryKey: ["coaches", "bjj"],
+    queryFn: () => fetchCoaches("bjj"),
     enabled: tab === "techniques",
   });
 
@@ -156,6 +162,31 @@ function SearchPage() {
               </div>
             ) : (
               <div className="space-y-2">
+                {(coachesQ.data ?? []).length > 0 && (
+                  <div className="space-y-2 pb-2">
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                      BJJ Coaches
+                    </p>
+                    <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5">
+                      {coachesQ.data!.map((c) => (
+                        <Link
+                          key={c.id}
+                          to="/u/$handle"
+                          params={{ handle: c.handle }}
+                          className="shrink-0 w-40 p-3 rounded-2xl bg-card border border-border space-y-2"
+                        >
+                          <div className="size-12 rounded-full border-2 border-accent overflow-hidden bg-secondary">
+                            {c.avatar_url && <img src={c.avatar_url} alt="" className="w-full h-full object-cover" />}
+                          </div>
+                          <p className="text-sm font-semibold truncate">{c.display_name || c.handle}</p>
+                          {c.coach_location && (
+                            <p className="text-[10px] text-muted-foreground line-clamp-2">{c.coach_location}</p>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                   Categories
                 </p>
