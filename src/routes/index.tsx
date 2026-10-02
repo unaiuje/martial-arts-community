@@ -28,6 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import { toastError } from "@/lib/errors";
 import { useOnlineStatus } from "@/hooks/use-online-status";
+import { fetchProfileMini } from "@/lib/public-profile";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import {
   FEED_PAGE_SIZE,
@@ -858,4 +859,32 @@ function timeAgo(iso: string): string {
   if (s < 86400) return `${Math.floor(s / 3600)}h`;
   if (s < 30 * 86400) return `${Math.floor(s / 86400)}d`;
   return new Date(iso).toLocaleDateString();
+}
+function AuthorBadge({ userId, handle, art, level }: { userId: string | null; handle: string; art: string; level: string }) {
+  const miniQ = useQuery({
+    queryKey: ["profile-mini", userId],
+    queryFn: () => fetchProfileMini(userId!),
+    enabled: !!userId,
+    staleTime: 5 * 60_000,
+  });
+  const mini = miniQ.data;
+  const h = mini?.handle ?? handle.replace(/^@/, "");
+  return (
+    <Link to="/u/$handle" params={{ handle: h }} className="flex items-center gap-2">
+      <div className="size-10 rounded-full border-2 border-accent overflow-hidden bg-secondary">
+        {mini?.avatar_url && <img src={mini.avatar_url} alt="" className="w-full h-full object-cover" />}
+      </div>
+      <div>
+        <p className="font-semibold text-sm tracking-tight text-white flex items-center gap-1.5">
+          {handle}
+          {mini?.is_coach && (
+            <span className="rounded-full bg-accent text-accent-foreground px-1.5 py-px text-[9px] font-bold uppercase">Coach</span>
+          )}
+        </p>
+        <p className="text-[10px] font-mono text-accent uppercase">
+          {art} · {level}
+        </p>
+      </div>
+    </Link>
+  );
 }
