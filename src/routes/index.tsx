@@ -494,13 +494,7 @@ function FeedCard({
         <div className="flex justify-between items-end gap-4 pointer-events-auto">
           <div className="space-y-3 max-w-[78%]">
             <div className="flex items-center gap-2">
-              <div className="size-10 rounded-full border-2 border-accent overflow-hidden bg-secondary" />
-              <div>
-                <p className="font-semibold text-sm tracking-tight text-white">{post.handle}</p>
-                <p className="text-[10px] font-mono text-accent uppercase">
-                  {post.art} · {post.level}
-                </p>
-              </div>
+              <AuthorBadge userId={(post as { user_id?: string | null }).user_id ?? null} handle={post.handle} art={post.art} level={post.level} />
               {!isMine && (
                 <button
                   onClick={() => onToggleFollow(following)}
