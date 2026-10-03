@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/tracker")({
     ],
   }),
   component: TrackerPage,
-  errorComponent: TrackerErrorBoundary,
+  errorComponent: TrackerErrorBoundary as never,
   notFoundComponent: TrackerNotFound,
 });
 
