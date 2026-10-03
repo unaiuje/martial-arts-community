@@ -30,7 +30,11 @@ test.describe("public routes", () => {
   test("search page lists BJJ technique categories", async ({ page }) => {
     await page.goto("/search", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: /bjj techniques/i }).click();
+    await page.waitForLoadState("networkidle");
+    await expect(async () => {
+      await page.getByRole("button", { name: /bjj techniques/i }).click();
+      await expect(page.getByText("Categories", { exact: true })).toBeVisible({ timeout: 3_000 });
+    }).toPass({ timeout: 20_000 });
     await expect(page.getByText("Categories", { exact: true })).toBeVisible({ timeout: 15_000 });
   });
 
@@ -58,7 +62,7 @@ test.describe("public routes", () => {
   });
 
   test("login shows a clear error with wrong credentials", async ({ page }) => {
-    await page.goto("/auth", { waitUntil: "domcontentloaded" });
+    await page.goto("/auth", { waitUntil: "networkidle" });
     await page.locator('input[type="email"]').fill("nobody+e2e@example.com");
     await page.locator('input[type="password"]').fill("wrong-password-123");
     await page.locator('form button[type="submit"]').click();
