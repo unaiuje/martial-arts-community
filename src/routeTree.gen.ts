@@ -16,6 +16,7 @@ import { Route as DuelsRouteImport } from './routes/duels'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedCreateRouteImport } from './routes/_authenticated/create'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -56,6 +57,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestionsRoute = SuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/suggestions': typeof SuggestionsRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/create': typeof AuthenticatedCreateRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/suggestions': typeof SuggestionsRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/create': typeof AuthenticatedCreateRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/suggestions': typeof SuggestionsRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/search'
+    | '/suggestions'
     | '/coach'
     | '/create'
     | '/profile'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/search'
+    | '/suggestions'
     | '/coach'
     | '/create'
     | '/profile'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/search'
+    | '/suggestions'
     | '/_authenticated/coach'
     | '/_authenticated/create'
     | '/_authenticated/profile'
@@ -198,6 +210,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
+  SuggestionsRoute: typeof SuggestionsRoute
   TechniqueCategorySlugRoute: typeof TechniqueCategorySlugRoute
   TechniqueSlugRoute: typeof TechniqueSlugRoute
   UHandleRoute: typeof UHandleRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggestions': {
+      id: '/suggestions'
+      path: '/suggestions'
+      fullPath: '/suggestions'
+      preLoaderRoute: typeof SuggestionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/coach': {
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
+  SuggestionsRoute: SuggestionsRoute,
   TechniqueCategorySlugRoute: TechniqueCategorySlugRoute,
   TechniqueSlugRoute: TechniqueSlugRoute,
   UHandleRoute: UHandleRoute,
