@@ -7,6 +7,7 @@ import { ARTS, formatCount } from "@/lib/mock-data";
 import { useStore } from "@/lib/store";
 import { fetchAllTechniques, fetchCategories } from "@/lib/techniques";
 import { fetchCoaches } from "@/lib/public-profile";
+import { GiBadge, GiToggle, matchesGiMode, useGiMode } from "@/lib/gi-mode";
 
 export const Route = createFileRoute("/search")({
   head: () => ({
@@ -54,10 +55,12 @@ function SearchPage() {
     enabled: tab === "techniques",
   });
 
+  const [giMode, setGiMode] = useGiMode();
   const techMatches = useMemo(() => {
     const term = q.trim().toLowerCase();
     if (!term || !techniquesQ.data) return [];
     return techniquesQ.data
+      .filter((t) => matchesGiMode(t.gi_mode, giMode))
       .filter(
         (t) =>
           t.name.toLowerCase().includes(term) ||
@@ -66,7 +69,7 @@ function SearchPage() {
           t.aka.some((a) => a.toLowerCase().includes(term)),
       )
       .slice(0, 40);
-  }, [q, techniquesQ.data]);
+  }, [q, techniquesQ.data, giMode]);
 
   return (
     <MobileShell>
@@ -128,6 +131,7 @@ function SearchPage() {
 
         {tab === "techniques" && (
           <section className="space-y-4">
+            <GiToggle mode={giMode} onChange={setGiMode} />
             {q.trim() ? (
               <div className="space-y-2">
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
@@ -147,7 +151,7 @@ function SearchPage() {
                           className="flex items-center justify-between p-3 rounded-xl bg-card border border-border"
                         >
                           <div>
-                            <p className="text-sm font-semibold">{t.name}</p>
+                            <p className="text-sm font-semibold">{t.name}<GiBadge mode={t.gi_mode} /></p>
                             <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
                               {t.category.name}
                               {t.from_position ? ` · ${t.from_position}` : ""}
