@@ -75,7 +75,12 @@ function SearchPage() {
     <MobileShell>
       <div className="space-y-6 animate-snap-in">
         <header className="space-y-3">
-          <h1 className="font-display text-4xl uppercase tracking-tight italic">Search</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="font-display text-4xl uppercase tracking-tight italic">Search</h1>
+            <Link to="/suggestions" className="text-[11px] font-bold uppercase px-3 py-1.5 rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground">
+              💡 Suggest
+            </Link>
+          </div>
           <div className="relative">
             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
