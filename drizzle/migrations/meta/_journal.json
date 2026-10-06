@@ -15,6 +15,13 @@
       "when": 1790957749840,
       "tag": "0001_coach_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791281500914,
+      "tag": "0002_technique_gi_mode",
+      "breakpoints": true
     }
   ]
 }
