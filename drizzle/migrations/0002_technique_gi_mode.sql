@@ -1,0 +1,3 @@
+ALTER TABLE public.techniques ADD COLUMN IF NOT EXISTS gi_mode text NOT NULL DEFAULT 'both';
+UPDATE public.techniques SET gi_mode = 'gi' WHERE slug IN ('baseball-bat','bow-and-arrow','cross-collar-guard','cross-collar-mount','lasso-guard','loop-choke','paper-cutter','spider-guard','worm-guard','tomoe-nage');
+UPDATE public.techniques SET gi_mode = 'nogi' WHERE slug IN ('heel-hook-inside','heel-hook-outside','body-lock','wrestle-up','double-under');

@@ -8,6 +8,7 @@ import avatar1 from "@/assets/avatar-1.jpg";
 export type Art =
   | "Boxing"
   | "BJJ"
+  | "Grappling"
   | "Judo"
   | "Wrestling"
   | "Kickboxing"
@@ -18,6 +19,7 @@ export type Art =
 export const ARTS: Art[] = [
   "Boxing",
   "BJJ",
+  "Grappling",
   "Judo",
   "Wrestling",
   "Kickboxing",

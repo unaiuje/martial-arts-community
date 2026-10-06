@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { fetchCategoryBySlug } from "@/lib/techniques";
+import { GiBadge, GiToggle, matchesGiMode, useGiMode } from "@/lib/gi-mode";
 
 export const Route = createFileRoute("/technique-category/$slug")({
   head: ({ params }) => ({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/technique-category/$slug")({
 function CategoryPage() {
   const { slug } = Route.useParams();
   const router = useRouter();
+  const [giMode, setGiMode] = useGiMode();
   const { data, isLoading } = useQuery({
     queryKey: ["technique-category", slug],
     queryFn: () => fetchCategoryBySlug(slug),
@@ -48,8 +50,10 @@ function CategoryPage() {
                 <p className="text-sm text-muted-foreground">{data.description}</p>
               )}
             </header>
+            <GiToggle mode={giMode} onChange={setGiMode} />
             <ul className="space-y-2">
               {[...data.techniques]
+                .filter((t) => matchesGiMode(t.gi_mode, giMode))
                 .sort((a, b) => a.sort_order - b.sort_order)
                 .map((t) => (
                   <li key={t.id}>
@@ -59,7 +63,7 @@ function CategoryPage() {
                       className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border hover:border-accent/40"
                     >
                       <div>
-                        <p className="font-semibold text-sm">{t.name}</p>
+                        <p className="font-semibold text-sm">{t.name}<GiBadge mode={t.gi_mode} /></p>
                         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                           {t.from_position ?? "—"}
                           {t.aka?.length ? ` · ${t.aka.join(", ")}` : ""}

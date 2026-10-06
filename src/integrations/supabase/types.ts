@@ -375,6 +375,7 @@ export type Database = {
           created_at: string
           description: string | null
           from_position: string | null
+          gi_mode: string
           id: string
           name: string
           slug: string
@@ -386,6 +387,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           from_position?: string | null
+          gi_mode?: string
           id?: string
           name: string
           slug: string
@@ -397,6 +399,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           from_position?: string | null
+          gi_mode?: string
           id?: string
           name?: string
           slug?: string
