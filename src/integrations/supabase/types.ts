@@ -338,6 +338,65 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestion_votes: {
+        Row: {
+          created_at: string
+          suggestion_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          suggestion_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          suggestion_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_votes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          body: string | null
+          category: string
+          created_at: string
+          id: string
+          status: string
+          title: string
+          user_id: string
+          votes: number
+        }
+        Insert: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          status?: string
+          title: string
+          user_id?: string
+          votes?: number
+        }
+        Update: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          status?: string
+          title?: string
+          user_id?: string
+          votes?: number
+        }
+        Relationships: []
+      }
       technique_categories: {
         Row: {
           art: string
