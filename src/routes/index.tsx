@@ -22,7 +22,7 @@ import {
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
-import { formatCount } from "@/lib/mock-data";
+import { ARTS, formatCount } from "@/lib/mock-data";
 import { actions, useStore } from "@/lib/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
@@ -87,10 +87,24 @@ function FeedPage() {
     }
   }, [justReconnected, queryClient]);
 
-  const feed = useMemo<FeedItem[]>(
+  const [artFilter, setArtFilter] = useState<string | null>(null);
+  const allFeed = useMemo<FeedItem[]>(
     () => (feedQ.data?.pages ?? []).flat(),
     [feedQ.data],
   );
+  const feed = useMemo<FeedItem[]>(
+    () =>
+      artFilter
+        ? allFeed.filter((p) => p.art.toLowerCase() === artFilter.toLowerCase())
+        : allFeed,
+    [allFeed, artFilter],
+  );
+  // With a filter active, keep paging until something matches (or we run out).
+  useEffect(() => {
+    if (artFilter && feed.length < 2 && feedQ.hasNextPage && !feedQ.isFetchingNextPage) {
+      feedQ.fetchNextPage();
+    }
+  }, [artFilter, feed.length, feedQ]);
 
   // Fetch which posts the user already liked / follows, in batch per page.
   const visibleIds = useMemo(() => feed.map((p) => p.id), [feed]);
@@ -235,7 +249,16 @@ function FeedPage() {
     return (
       <MobileShell fullBleed>
         <ConnectionBanner online={online} justReconnected={justReconnected} />
-        <FeedEmpty onRetry={() => feedQ.refetch()} />
+        <FeedArtFilter value={artFilter} onChange={setArtFilter} />
+        {artFilter ? (
+          <>
+            <div className="h-[100dvh] flex items-center justify-center px-8 text-center text-sm text-muted-foreground">
+              {feedQ.isFetchingNextPage ? "Looking for videos…" : `No ${artFilter} videos yet.`}
+            </div>
+          </>
+        ) : (
+          <FeedEmpty onRetry={() => feedQ.refetch()} />
+        )}
       </MobileShell>
     );
   }
@@ -243,6 +266,7 @@ function FeedPage() {
   return (
     <MobileShell fullBleed>
       <ConnectionBanner online={online} justReconnected={justReconnected} />
+      <FeedArtFilter value={artFilter} onChange={setArtFilter} />
       {hasError && (
         <FeedErrorBanner
           error={feedQ.error as Error}
@@ -886,5 +910,28 @@ function AuthorBadge({ userId, handle, art, level }: { userId: string | null; ha
         </p>
       </div>
     </Link>
+  );
+}
+
+function FeedArtFilter({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+  const opts: (string | null)[] = [null, ...ARTS];
+  return (
+    <div className="absolute top-14 inset-x-0 z-20 flex gap-2 overflow-x-auto no-scrollbar px-4 pointer-events-auto" aria-label="Filter by martial art">
+      {opts.map((a) => {
+        const on = value === a;
+        return (
+          <button
+            key={a ?? "all"}
+            onClick={() => onChange(a)}
+            aria-pressed={on}
+            className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-bold uppercase backdrop-blur-md ${
+              on ? "bg-accent text-accent-foreground" : "bg-black/40 border border-white/15 text-white/80"
+            }`}
+          >
+            {a ?? "All"}
+          </button>
+        );
+      })}
+    </div>
   );
 }
