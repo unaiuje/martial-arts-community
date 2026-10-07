@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { fetchPostsForTechnique, fetchTechniqueBySlug } from "@/lib/techniques";
+import { GiBadge, GiEditor } from "@/lib/gi-mode";
 
 export const Route = createFileRoute("/technique/$slug")({
   head: ({ params }) => ({
@@ -53,6 +54,10 @@ function TechniquePage() {
               <h1 className="font-display text-4xl uppercase tracking-tight italic">
                 {info.data.name}
               </h1>
+              <div className="flex items-center gap-2">
+                <GiBadge mode={info.data.gi_mode} />
+                <GiEditor techniqueId={info.data.id} mode={info.data.gi_mode} />
+              </div>
               {info.data.from_position && (
                 <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                   from {info.data.from_position}

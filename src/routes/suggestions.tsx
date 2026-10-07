@@ -7,6 +7,7 @@ import { MobileShell } from "@/components/MobileShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseUser } from "@/hooks/use-supabase-user";
 import { toastError } from "@/lib/errors";
+import { useIsAdmin } from "@/lib/admin";
 
 export const Route = createFileRoute("/suggestions")({
   head: () => ({
@@ -32,6 +33,7 @@ const CATS = [
 function SuggestionsPage() {
   const { user } = useSupabaseUser();
   const qc = useQueryClient();
+  const isAdmin = useIsAdmin();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<string>("feature");
@@ -176,7 +178,20 @@ function SuggestionsPage() {
                   <p className="text-sm font-semibold break-words">{s.title}</p>
                   {s.body && <p className="text-xs text-muted-foreground whitespace-pre-line break-words">{s.body}</p>}
                 </div>
-                {user?.id === s.user_id && (
+                {isAdmin && (
+                  <select aria-label="Status" value={s.status}
+                    onChange={async (e) => {
+                      const { error } = await supabase.from("suggestions").update({ status: e.target.value }).eq("id", s.id);
+                      if (error) return toastError(error, "suggestion_status");
+                      refresh();
+                    }}
+                    className="self-start text-[10px] font-bold uppercase rounded-lg bg-secondary border border-border px-1.5 py-1">
+                    <option value="open">Open</option>
+                    <option value="planned">Planned</option>
+                    <option value="done">Done</option>
+                  </select>
+                )}
+                {(user?.id === s.user_id || isAdmin) && (
                   <button onClick={() => remove(s.id)} aria-label="Delete suggestion" className="self-start text-muted-foreground hover:text-destructive">
                     <Trash2 className="size-4" />
                   </button>
