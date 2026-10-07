@@ -249,9 +249,9 @@ function FeedPage() {
     return (
       <MobileShell fullBleed>
         <ConnectionBanner online={online} justReconnected={justReconnected} />
+        <FeedArtFilter value={artFilter} onChange={setArtFilter} />
         {artFilter ? (
           <>
-            <FeedArtFilter value={artFilter} onChange={setArtFilter} />
             <div className="h-[100dvh] flex items-center justify-center px-8 text-center text-sm text-muted-foreground">
               {feedQ.isFetchingNextPage ? "Looking for videos…" : `No ${artFilter} videos yet.`}
             </div>
