@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useT, useI18n } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
+import { processImage } from "@/lib/image";
+import { uploadMedia } from "@/lib/media-upload";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -32,6 +34,28 @@ function Onboarding() {
   const [arts, setArts] = useState<Art[]>([]);
   const [level, setLevel] = useState<(typeof LEVELS)[number] | null>(null);
   const [prefs, setPrefs] = useState<string[]>([]);
+  const [avatar, setAvatar] = useState<string | undefined>();
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const onPickAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setAvatarBusy(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      const processed = await processImage(f, { maxDim: 512, thumbDim: 256, quality: 0.85 });
+      const blob = await (await fetch(processed.full)).blob();
+      const { url } = await uploadMedia(blob, {
+        folder: "avatars",
+        filename: `avatar-${u.user?.id ?? "me"}`,
+        contentType: blob.type || "image/webp",
+      });
+      setAvatar(url);
+    } catch (err) {
+      toast.error((err as Error).message || t("profile.avatarError"));
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   const stepKeys = ["onb.identity", "onb.disciplines", "onb.skill", "onb.interests"] as const;
   const steps = stepKeys.map((k) => t(k));
@@ -99,6 +123,7 @@ function Onboarding() {
             display_name: name.trim() || null,
             handle: cleanHandle || u.user.email?.split("@")[0] || "user",
             primary_art: arts[0] ?? null,
+            ...(avatar ? { avatar_url: avatar } : {}),
           })
           .eq("id", u.user.id);
         if (error) toast.error(`Profile not saved: ${error.message}`);
@@ -180,6 +205,13 @@ function Onboarding() {
 
         {step === 0 && (
           <div className="space-y-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <span className="size-16 rounded-full bg-secondary overflow-hidden flex items-center justify-center text-xs text-muted-foreground border border-border">
+                {avatar ? <img src={avatar} alt="Avatar" className="size-full object-cover" /> : avatarBusy ? "…" : "+"}
+              </span>
+              <span className="text-sm">{lang === "es" ? "Foto de perfil (opcional)" : "Profile photo (optional)"}</span>
+              <input type="file" accept="image/*" className="hidden" onChange={onPickAvatar} disabled={avatarBusy} />
+            </label>
             <Field label={t("onb.name")}>
               <input
                 value={name}
