@@ -139,7 +139,7 @@ function PublicProfilePage() {
 
         <section className="grid grid-cols-3 gap-1.5">
           {(postsQ.data ?? []).map((v) => (
-            <Link key={v.id} to="/" search={{ post: v.id } as never} className="relative aspect-[9/14] rounded-lg overflow-hidden bg-secondary">
+            <Link key={v.id} to="/v/$id" params={{ id: v.id }} className="relative aspect-[9/14] rounded-lg overflow-hidden bg-secondary">
               {v.poster && <img src={v.poster} alt={v.caption} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />}
               <span className="absolute bottom-1 left-1.5 text-[10px] font-mono text-white drop-shadow">♥ {formatCount(v.likes)}</span>
             </Link>

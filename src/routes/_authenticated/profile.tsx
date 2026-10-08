@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Lock, Flame, Award, Pencil, X, Check, Camera, Plus, Trash2, Download, LogOut, Eye, EyeOff, MoreVertical, Loader2, Video as VideoIcon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -403,8 +403,10 @@ function MyVideoTile({
   const [open, setOpen] = useState(false);
   return (
     <div className="relative aspect-[9/14] rounded-xl overflow-hidden bg-secondary group">
-      <img src={post.poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent" />
+      <Link to="/v/$id" params={{ id: post.id }} aria-label="Open video" className="absolute inset-0">
+        <img src={post.poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent" />
+      </Link>
       {post.visibility === "private" && (
         <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono uppercase tracking-widest text-white flex items-center gap-1">
           <EyeOff className="size-2.5" /> Private
