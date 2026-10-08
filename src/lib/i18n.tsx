@@ -219,3 +219,8 @@ export function useI18n() {
 export function useT() {
   return useContext(I18nCtx).t;
 }
+/** Inline bilingual helper: tr("English", "Español"). */
+export function useTr() {
+  const { lang } = useContext(I18nCtx);
+  return (en: string, es: string) => (lang === "es" ? es : en);
+}
