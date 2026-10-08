@@ -1,3 +1,4 @@
+import { useTr } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ function CoachSettings() {
   const [schedule, setSchedule] = useState("");
   const [arts, setArts] = useState<string[]>(["BJJ"]);
   const [saving, setSaving] = useState(false);
+  const tr = useTr();
 
   useEffect(() => {
     if (!user) return;
@@ -45,7 +47,7 @@ function CoachSettings() {
 
   async function save() {
     if (isCoach && (!location.trim() || !schedule.trim())) {
-      toast.error("Add your location and schedule");
+      toast.error(tr("Add your location and schedule", "Añade tu ubicación y horario"));
       return;
     }
     setSaving(true);
@@ -56,7 +58,7 @@ function CoachSettings() {
         coach_schedule: schedule.trim() || null,
         coach_arts: arts.map((a) => a.toLowerCase()),
       });
-      toast.success("Coach profile saved");
+      toast.success(tr("Coach profile saved", "Perfil de entrenador guardado"));
       if (profile?.handle) navigate({ to: "/u/$handle", params: { handle: profile.handle } });
     } catch (e) {
       toastError(e, "coach_save");
@@ -70,15 +72,15 @@ function CoachSettings() {
   return (
     <MobileShell>
       <div className="space-y-5 animate-snap-in">
-        <h1 className="font-display text-3xl uppercase italic">Coach profile</h1>
+        <h1 className="font-display text-3xl uppercase italic">{tr("Coach profile", "Perfil de entrenador")}</h1>
         <label className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border">
-          <span className="text-sm font-semibold">I teach classes</span>
+          <span className="text-sm font-semibold">{tr("I teach classes", "Doy clases")}</span>
           <input type="checkbox" checked={isCoach} onChange={(e) => setIsCoach(e.target.checked)} className="size-5 accent-[hsl(var(--accent))]" />
         </label>
         {isCoach && (
           <>
             <div className="space-y-1.5">
-              <p className="text-[10px] font-mono uppercase text-muted-foreground">Arts you teach</p>
+              <p className="text-[10px] font-mono uppercase text-muted-foreground">{tr("Arts you teach", "Artes que enseñas")}</p>
               <div className="flex flex-wrap gap-2">
                 {ARTS.map((a) => {
                   const on = arts.map((x) => x.toLowerCase()).includes(a.toLowerCase());
@@ -93,18 +95,18 @@ function CoachSettings() {
               </div>
             </div>
             <label className="block space-y-1.5">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground">Location (gym, city)</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground">{tr("Location (gym, city)", "Ubicación (gimnasio, ciudad)")}</span>
               <input value={location} onChange={(e) => setLocation(e.target.value)} maxLength={160} className={input} placeholder="Gracie Barra, Madrid" />
             </label>
             <label className="block space-y-1.5">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground">Schedule</span>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground">{tr("Schedule", "Horario")}</span>
               <textarea value={schedule} onChange={(e) => setSchedule(e.target.value)} maxLength={600} rows={5} className={input} placeholder={"Mon/Wed/Fri 19:30–20:30 BJJ\nSat 11:00 Open mat"} />
             </label>
-            <p className="text-xs text-muted-foreground">Your training videos are the public videos you upload.</p>
+            <p className="text-xs text-muted-foreground">{tr("Your training videos are the public videos you upload.", "Tus vídeos de entrenamiento son los vídeos públicos que subes.")}</p>
           </>
         )}
         <button onClick={save} disabled={saving} className="w-full h-12 rounded-xl bg-accent text-accent-foreground font-bold uppercase disabled:opacity-60">
-          {saving ? "Saving…" : "Save"}
+          {saving ? tr("Saving…", "Guardando…") : tr("Save", "Guardar")}
         </button>
       </div>
     </MobileShell>

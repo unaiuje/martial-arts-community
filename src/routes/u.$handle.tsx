@@ -1,3 +1,4 @@
+import { useTr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MapPin, Clock, GraduationCap, Settings } from "lucide-react";
@@ -26,6 +27,7 @@ function PublicProfilePage() {
   const { handle } = Route.useParams();
   const qc = useQueryClient();
   const { user } = useSupabaseUser();
+  const tr = useTr();
 
   const profileQ = useQuery({ queryKey: ["public-profile", handle], queryFn: () => fetchPublicProfile(handle) });
   const p = profileQ.data;
@@ -58,7 +60,7 @@ function PublicProfilePage() {
   if (!p) {
     return (
       <MobileShell>
-        <p className="text-center text-muted-foreground py-20">User @{handle} not found.</p>
+        <p className="text-center text-muted-foreground py-20">{tr("User", "Usuario")} @{handle} {tr("not found.", "no encontrado (not found).")}</p>
       </MobileShell>
     );
   }
@@ -96,31 +98,31 @@ function PublicProfilePage() {
           </div>
           {p.bio && <p className="text-sm text-muted-foreground max-w-xs">{p.bio}</p>}
           <div className="flex gap-8">
-            <Stat n={postsQ.data?.length ?? 0} label="Videos" />
-            <Stat n={countsQ.data?.followers ?? 0} label="Followers" />
-            <Stat n={countsQ.data?.following ?? 0} label="Following" />
+            <Stat n={postsQ.data?.length ?? 0} label={tr("Videos", "Vídeos")} />
+            <Stat n={countsQ.data?.followers ?? 0} label={tr("Followers", "Seguidores")} />
+            <Stat n={countsQ.data?.following ?? 0} label={tr("Following", "Siguiendo")} />
           </div>
           {isMe ? (
             <Link to="/coach" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary border border-border text-xs font-bold uppercase">
-              <Settings className="size-3.5" /> Coach settings
+              <Settings className="size-3.5" /> {tr("Coach settings", "Ajustes de entrenador")}
             </Link>
           ) : user ? (
             <button
               onClick={onFollow}
               className={`px-6 py-2 rounded-xl text-xs font-bold uppercase ${following ? "bg-secondary border border-border" : "bg-accent text-accent-foreground"}`}
             >
-              {following ? "Following" : "Follow"}
+              {following ? tr("Following", "Siguiendo") : tr("Follow", "Seguir")}
             </button>
           ) : (
             <Link to="/auth" search={{ redirect: `/u/${p.handle}` }} className="px-6 py-2 rounded-xl bg-accent text-accent-foreground text-xs font-bold uppercase">
-              Sign in to follow
+              {tr("Sign in to follow", "Inicia sesión para seguir")}
             </Link>
           )}
         </header>
 
         {p.is_coach && (p.coach_location || p.coach_schedule) && (
           <section className="rounded-2xl bg-card border border-border p-4 space-y-3">
-            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Coaching</p>
+            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Coaching", "Clases")}</p>
             {p.coach_arts.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {p.coach_arts.map((a) => (
@@ -145,7 +147,7 @@ function PublicProfilePage() {
             </Link>
           ))}
           {postsQ.data && postsQ.data.length === 0 && (
-            <p className="col-span-3 text-center text-sm text-muted-foreground py-10">No public videos yet.</p>
+            <p className="col-span-3 text-center text-sm text-muted-foreground py-10">{tr("No public videos yet.", "Aún no hay vídeos públicos.")}</p>
           )}
         </section>
       </div>

@@ -1,3 +1,4 @@
+import { useTr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -24,10 +25,10 @@ export const Route = createFileRoute("/suggestions")({
 });
 
 const CATS = [
-  { v: "feature", label: "Feature" },
-  { v: "technique", label: "Technique" },
-  { v: "bug", label: "Bug" },
-  { v: "other", label: "Other" },
+  { v: "feature", label: "Feature", es: "Función" },
+  { v: "technique", label: "Technique", es: "Técnica" },
+  { v: "bug", label: "Bug", es: "Error" },
+  { v: "other", label: "Other", es: "Otro" },
 ] as const;
 
 function SuggestionsPage() {
@@ -39,6 +40,7 @@ function SuggestionsPage() {
   const [category, setCategory] = useState<string>("feature");
   const [sort, setSort] = useState<"top" | "new">("top");
   const [busy, setBusy] = useState(false);
+  const tr = useTr();
 
   const listQ = useQuery({
     queryKey: ["suggestions", sort],
@@ -69,7 +71,7 @@ function SuggestionsPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (title.trim().length < 3) return toast.error("Write a title (at least 3 characters)");
+    if (title.trim().length < 3) return toast.error(tr("Write a title (at least 3 characters)", "Escribe un título (mínimo 3 caracteres)"));
     setBusy(true);
     try {
       const { error } = await supabase.from("suggestions").insert({
@@ -81,7 +83,7 @@ function SuggestionsPage() {
       if (error) throw error;
       setTitle("");
       setBody("");
-      toast.success("Thanks! Suggestion posted");
+      toast.success(tr("Thanks! Suggestion posted", "¡Gracias! Sugerencia publicada"));
       refresh();
     } catch (err) {
       toastError(err, "suggestion_create");
@@ -91,7 +93,7 @@ function SuggestionsPage() {
   }
 
   async function vote(id: string, voted: boolean) {
-    if (!user) return toast.error("Sign in to vote");
+    if (!user) return toast.error(tr("Sign in to vote", "Inicia sesión para votar"));
     try {
       const q = voted
         ? supabase.from("suggestion_votes").delete().eq("suggestion_id", id).eq("user_id", user.id)
@@ -116,29 +118,29 @@ function SuggestionsPage() {
     <MobileShell>
       <div className="space-y-6 animate-snap-in">
         <header className="space-y-1">
-          <h1 className="font-display text-4xl uppercase italic tracking-tight">Suggestions</h1>
-          <p className="text-sm text-muted-foreground">What should we add next? Vote for the ideas you want.</p>
+          <h1 className="font-display text-4xl uppercase italic tracking-tight">{tr("Suggestions", "Sugerencias")}</h1>
+          <p className="text-sm text-muted-foreground">{tr("What should we add next? Vote for the ideas you want.", "¿Qué añadimos ahora? Vota las ideas que quieras.")}</p>
         </header>
 
         {user ? (
           <form onSubmit={submit} className="space-y-3 p-4 rounded-2xl bg-card border border-border">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="Your idea in one line" className={input} />
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={1000} rows={3} placeholder="Details (optional)" className={input} />
+            <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder={tr("Your idea in one line", "Tu idea en una línea")} className={input} />
+            <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={1000} rows={3} placeholder={tr("Details (optional)", "Detalles (opcional)")} className={input} />
             <div className="flex flex-wrap gap-2">
               {CATS.map((c) => (
                 <button key={c.v} type="button" onClick={() => setCategory(c.v)}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase ${category === c.v ? "bg-accent text-accent-foreground" : "bg-secondary border border-border text-muted-foreground"}`}>
-                  {c.label}
+                  {tr(c.label, c.es)}
                 </button>
               ))}
             </div>
             <button type="submit" disabled={busy} className="w-full h-11 rounded-xl bg-accent text-accent-foreground font-bold uppercase text-sm disabled:opacity-60">
-              {busy ? "Posting…" : "Post suggestion"}
+              {busy ? tr("Posting…", "Publicando…") : tr("Post suggestion", "Publicar sugerencia")}
             </button>
           </form>
         ) : (
           <Link to="/auth" search={{ redirect: "/suggestions" }} className="block text-center p-4 rounded-2xl bg-card border border-border text-sm font-semibold">
-            Sign in to suggest ideas and vote
+            {tr("Sign in to suggest ideas and vote", "Inicia sesión para sugerir y votar")}
           </Link>
         )}
 
@@ -146,17 +148,17 @@ function SuggestionsPage() {
           {(["top", "new"] as const).map((s) => (
             <button key={s} onClick={() => setSort(s)}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold uppercase ${sort === s ? "bg-accent text-accent-foreground" : "bg-secondary border border-border text-muted-foreground"}`}>
-              {s === "top" ? "Top" : "Newest"}
+              {s === "top" ? tr("Top", "Más votadas") : tr("Newest", "Recientes")}
             </button>
           ))}
         </div>
 
         <ul className="space-y-2">
-          {listQ.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {listQ.isLoading && <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>}
           {listQ.data?.length === 0 && (
             <div className="text-center py-10 text-muted-foreground space-y-2">
               <Lightbulb className="size-6 mx-auto" />
-              <p className="text-sm">No suggestions yet. Be the first!</p>
+              <p className="text-sm">{tr("No suggestions yet. Be the first!", "Aún no hay sugerencias. ¡Sé el primero!")}</p>
             </div>
           )}
           {listQ.data?.map((s) => {
@@ -186,9 +188,9 @@ function SuggestionsPage() {
                       refresh();
                     }}
                     className="self-start text-[10px] font-bold uppercase rounded-lg bg-secondary border border-border px-1.5 py-1">
-                    <option value="open">Open</option>
-                    <option value="planned">Planned</option>
-                    <option value="done">Done</option>
+                    <option value="open">{tr("Open", "Abierta")}</option>
+                    <option value="planned">{tr("Planned", "Planeada")}</option>
+                    <option value="done">{tr("Done", "Hecha")}</option>
                   </select>
                 )}
                 {(user?.id === s.user_id || isAdmin) && (
