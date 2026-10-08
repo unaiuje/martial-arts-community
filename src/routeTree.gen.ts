@@ -24,6 +24,7 @@ import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticate
 import { Route as TechniqueCategorySlugRouteImport } from './routes/technique-category.$slug'
 import { Route as TechniqueSlugRouteImport } from './routes/technique.$slug'
 import { Route as UHandleRouteImport } from './routes/u.$handle'
+import { Route as VIdRouteImport } from './routes/v.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -99,6 +100,11 @@ const UHandleRoute = UHandleRouteImport.update({
   path: '/u/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VIdRoute = VIdRouteImport.update({
+  id: '/v/$id',
+  path: '/v/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/technique-category/$slug': typeof TechniqueCategorySlugRoute
   '/technique/$slug': typeof TechniqueSlugRoute
   '/u/$handle': typeof UHandleRoute
+  '/v/$id': typeof VIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/technique-category/$slug': typeof TechniqueCategorySlugRoute
   '/technique/$slug': typeof TechniqueSlugRoute
   '/u/$handle': typeof UHandleRoute
+  '/v/$id': typeof VIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/technique-category/$slug': typeof TechniqueCategorySlugRoute
   '/technique/$slug': typeof TechniqueSlugRoute
   '/u/$handle': typeof UHandleRoute
+  '/v/$id': typeof VIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/technique-category/$slug'
     | '/technique/$slug'
     | '/u/$handle'
+    | '/v/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/technique-category/$slug'
     | '/technique/$slug'
     | '/u/$handle'
+    | '/v/$id'
   id:
     | '__root__'
     | '/'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/technique-category/$slug'
     | '/technique/$slug'
     | '/u/$handle'
+    | '/v/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   TechniqueCategorySlugRoute: typeof TechniqueCategorySlugRoute
   TechniqueSlugRoute: typeof TechniqueSlugRoute
   UHandleRoute: typeof UHandleRoute
+  VIdRoute: typeof VIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/v/$id': {
+      id: '/v/$id'
+      path: '/v/$id'
+      fullPath: '/v/$id'
+      preLoaderRoute: typeof VIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -355,6 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   TechniqueCategorySlugRoute: TechniqueCategorySlugRoute,
   TechniqueSlugRoute: TechniqueSlugRoute,
   UHandleRoute: UHandleRoute,
+  VIdRoute: VIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

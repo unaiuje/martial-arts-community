@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Lock, Flame, Award, Pencil, X, Check, Camera, Plus, Trash2, Download, LogOut, Eye, EyeOff, MoreVertical, Loader2, Video as VideoIcon } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
