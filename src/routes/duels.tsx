@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle, CheckCircle2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -51,7 +52,7 @@ function DuelsPage() {
     },
     onError: (err) => {
       const msg = (err as Error).message;
-      if (msg === "AUTH_REQUIRED") toast.error("Sign in to vote");
+      if (msg === "AUTH_REQUIRED") toast.error(tr("Sign in to vote", "Inicia sesión para votar"));
       else toast.error(msg || "Could not vote");
     },
   });
@@ -60,14 +61,14 @@ function DuelsPage() {
     <MobileShell>
       <div className="space-y-8 animate-snap-in">
         <header className="space-y-1">
-          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">Community judged</p>
-          <h1 className="font-display text-4xl uppercase tracking-tight italic">Technique Duels</h1>
-          <p className="text-sm text-muted-foreground">Pick the cleaner execution. Results update live.</p>
+          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">{tr("Community judged", "Votado por la comunidad")}</p>
+          <h1 className="font-display text-4xl uppercase tracking-tight italic">{tr("Technique Duels", "Duelos de técnica")}</h1>
+          <p className="text-sm text-muted-foreground">{tr("Pick the cleaner execution. Results update live.", "Elige la ejecución más limpia. Resultados en directo.")}</p>
         </header>
 
         {allDuels.length === 0 ? (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            No duels yet. Create one from the + button to challenge the community.
+            {tr("No duels yet. Create one from the + button to challenge the community.", "Aún no hay duelos. Crea uno con el botón + para retar a la comunidad.")}
           </div>
         ) : (
         <div className="space-y-8">
@@ -148,7 +149,7 @@ function DuelCard({
 
       <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-secondary border border-border text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
         <MessageCircle className="size-3.5" />
-        Add analysis
+        {tr("Add analysis", "Añadir análisis")}
       </button>
     </article>
   );

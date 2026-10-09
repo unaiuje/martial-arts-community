@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "@tanstack/react-router";
@@ -179,7 +180,7 @@ function TrackerPage() {
             <ArrowLeft className="size-4" />
           </Link>
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1">
-            <Lock className="size-3" /> Private
+            <Lock className="size-3" /> {tr("Private", "Privado")}
           </p>
           <button
             onClick={() => { setPrefillDate(null); setAdding(true); }}
@@ -191,7 +192,7 @@ function TrackerPage() {
         </header>
 
         <div>
-          <h1 className="font-display text-4xl uppercase tracking-tight italic">Training Log</h1>
+          <h1 className="font-display text-4xl uppercase tracking-tight italic">{tr("Training Log", "Registro de entrenamiento")}</h1>
           <p className="text-sm text-muted-foreground">
             {user.name.split(" ")[0]} · Streak {streak} {streak === 1 ? "day" : "days"} · Keep it lit.
           </p>
@@ -214,7 +215,7 @@ function TrackerPage() {
 
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl uppercase italic tracking-tight">Calendar</h2>
+            <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Calendar", "Calendario")}</h2>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setMonthOffset((m) => m - 1)}
@@ -281,7 +282,7 @@ function TrackerPage() {
 
         <section className="space-y-3">
           <div className="flex justify-between items-baseline">
-            <h2 className="font-display text-xl uppercase italic tracking-tight">Monthly Recap</h2>
+            <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Monthly Recap", "Resumen mensual")}</h2>
             <span className="text-[10px] font-mono text-muted-foreground uppercase">{monthLabel}</span>
           </div>
           <div className="bg-card border border-border rounded-2xl p-4 space-y-4">
@@ -292,7 +293,7 @@ function TrackerPage() {
             </div>
             <div className="space-y-1.5">
               <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest">
-                <span className="text-muted-foreground">Consistency</span>
+                <span className="text-muted-foreground">{tr("Consistency", "Constancia")}</span>
                 <span className="text-accent">
                   {monthlyRecap.activeDays}/{monthlyRecap.daysInMonth} days · {monthlyRecap.consistency}%
                 </span>
@@ -309,9 +310,9 @@ function TrackerPage() {
 
         <section className="space-y-3">
           <div className="flex justify-between items-baseline">
-            <h2 className="font-display text-xl uppercase italic tracking-tight">Last 28 Days</h2>
+            <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Last 28 Days", "Últimos 28 días")}</h2>
             <span className="text-[10px] font-mono text-muted-foreground uppercase">
-              RPE intensity
+              {tr("RPE intensity", "Intensidad RPE")}
             </span>
           </div>
           <div className="grid grid-cols-7 gap-1.5">
@@ -338,7 +339,7 @@ function TrackerPage() {
 
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl uppercase italic tracking-tight">Goals</h2>
+            <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Goals", "Objetivos")}</h2>
             <button
               onClick={() => {
                 const title = prompt("Goal title (e.g. Improve guard passing)");
@@ -382,10 +383,10 @@ function TrackerPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl uppercase italic tracking-tight">Recent Sessions</h2>
+          <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Recent Sessions", "Sesiones recientes")}</h2>
           {sorted.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No sessions yet. Tap + to log your first round.
+              {tr("No sessions yet. Tap + to log your first round.", "Aún no hay sesiones. Toca + para registrar la primera.")}
             </p>
           )}
           <div className="space-y-2">
@@ -473,16 +474,16 @@ function PrivateGate() {
           <Lock className="size-7 text-accent" />
         </div>
         <div className="space-y-2">
-          <h1 className="font-display text-3xl uppercase italic tracking-tight">Private Tracker</h1>
+          <h1 className="font-display text-3xl uppercase italic tracking-tight">{tr("Private Tracker", "Tracker privado")}</h1>
           <p className="text-sm text-muted-foreground max-w-xs">
-            Your training log is only visible to you. Create your fighter profile to unlock it.
+            {tr("Your training log is only visible to you. Create your fighter profile to unlock it.", "Tu registro solo lo ves tú. Crea tu perfil para desbloquearlo.")}
           </p>
         </div>
         <Link
           to="/onboarding"
           className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-bold uppercase tracking-wide text-sm"
         >
-          Create Profile
+          {tr("Create Profile", "Crear perfil")}
         </Link>
       </div>
     </MobileShell>
@@ -531,7 +532,7 @@ function StreakCard({ sessions, streak }: { sessions: TrainingSession[]; streak:
   return (
     <section className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 via-card to-card p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl uppercase italic tracking-tight">Streak</h2>
+        <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Streak", "Racha")}</h2>
         <span
           className={`text-[10px] font-mono uppercase tracking-widest ${
             trainedToday ? "text-accent" : "text-muted-foreground"
@@ -593,7 +594,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
   const save = () => {
     const url = stravaUrl.trim();
     if (url && !/^https?:\/\//i.test(url)) {
-      toast.error("Strava link must start with http(s)://");
+      toast.error(tr("Strava link must start with http(s)://", "El enlace de Strava debe empezar por http(s)://"));
       return;
     }
     actions.addSession({
@@ -616,7 +617,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
       <button onClick={onClose} aria-label="Close" className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div className="relative w-full max-h-[90dvh] overflow-y-auto bg-card border-t border-border rounded-t-2xl animate-snap-in">
         <div className="flex items-center justify-between p-4 border-b border-border sticky top-0 bg-card">
-          <h3 className="font-display uppercase italic tracking-tight">Log Session</h3>
+          <h3 className="font-display uppercase italic tracking-tight">{tr("Log Session", "Registrar sesión")}</h3>
           <button onClick={onClose} aria-label="Close" className="size-8 rounded-full bg-secondary flex items-center justify-center">
             <X className="size-4" />
           </button>
@@ -630,7 +631,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
                   completed ? "bg-accent text-accent-foreground border-accent" : "bg-secondary border-border text-muted-foreground"
                 }`}
               >
-                Completed
+                {tr("Completed", "Completada")}
               </button>
               <button
                 onClick={() => setCompleted(false)}
@@ -638,7 +639,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
                   !completed ? "bg-accent text-accent-foreground border-accent" : "bg-secondary border-border text-muted-foreground"
                 }`}
               >
-                Planned
+                {tr("Planned", "Planeada")}
               </button>
             </div>
           </Field>
@@ -693,7 +694,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Drilled kimuras, sparred 3 rounds…"
+              placeholder={tr("Drilled kimuras, sparred 3 rounds…", "Kimuras, 3 rounds de sparring…")}
               className="w-full bg-secondary rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent resize-none"
             />
           </Field>
@@ -701,7 +702,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
             <input
               value={activity}
               onChange={(e) => setActivity(e.target.value)}
-              placeholder="Running, Swimming, Yoga…"
+              placeholder={tr("Running, Swimming, Yoga…", "Correr, nadar, yoga…")}
               maxLength={40}
               className="w-full bg-secondary rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent"
             />
@@ -765,7 +766,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
             onClick={save}
             className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-bold uppercase tracking-wide active:scale-[0.98] transition-transform"
           >
-            Save Session
+            {tr("Save Session", "Guardar sesión")}
           </button>
         </div>
       </div>
@@ -808,17 +809,17 @@ function WeeklySchedule({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl uppercase italic tracking-tight">Weekly Schedule</h2>
+        <h2 className="font-display text-xl uppercase italic tracking-tight">{tr("Weekly Schedule", "Horario semanal")}</h2>
         <button
           onClick={onAdd}
           className="flex items-center gap-1 text-[10px] font-mono uppercase text-accent tracking-widest"
         >
-          <Plus className="size-3" /> Add
+          <Plus className="size-3" /> {tr("Add", "Añadir")}
         </button>
       </div>
       {schedule.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          Set your recurring training (e.g. BJJ Mon/Wed/Fri 19:30–20:30).
+          {tr("Set your recurring training (e.g. BJJ Mon/Wed/Fri 19:30–20:30).", "Configura tus entrenos fijos (p. ej. BJJ lun/mié/vie 19:30–20:30).")}
         </p>
       )}
       <div className="grid grid-cols-7 gap-1.5">
@@ -878,7 +879,7 @@ function WeeklySchedule({
                   onClick={() => onEdit(s)}
                   className="text-[10px] font-mono uppercase text-accent tracking-wider px-2"
                 >
-                  Edit
+                  {tr("Edit", "Editar")}
                 </button>
                 <button
                   onClick={() => actions.deleteScheduleSlot(s.id)}
@@ -913,9 +914,9 @@ function ScheduleSlotSheet({
     setDays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
 
   const save = () => {
-    if (!label.trim()) { toast.error("Add an activity name"); return; }
-    if (days.length === 0) { toast.error("Pick at least one day"); return; }
-    if (start >= end) { toast.error("End time must be after start"); return; }
+    if (!label.trim()) { toast.error(tr("Add an activity name", "Añade el nombre de la actividad")); return; }
+    if (days.length === 0) { toast.error(tr("Pick at least one day", "Elige al menos un día")); return; }
+    if (start >= end) { toast.error(tr("End time must be after start", "La hora de fin debe ser posterior al inicio")); return; }
     const payload = {
       label: label.trim(),
       days: days.slice().sort(),
@@ -946,7 +947,7 @@ function ScheduleSlotSheet({
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="BJJ, Kickboxing, Running…"
+              placeholder={tr("BJJ, Kickboxing, Running…", "BJJ, kickboxing, correr…")}
               maxLength={40}
               className="w-full bg-secondary rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent"
             />
@@ -995,7 +996,7 @@ function ScheduleSlotSheet({
             <input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Gracie Barra, Home gym…"
+              placeholder={tr("Gracie Barra, Home gym…", "Gracie Barra, gimnasio de casa…")}
               maxLength={60}
               className="w-full bg-secondary rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-accent"
             />
