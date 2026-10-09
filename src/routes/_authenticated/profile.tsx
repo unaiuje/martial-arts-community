@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Lock, Flame, Award, Pencil, X, Check, Camera, Plus, Trash2, Download, LogOut, Eye, EyeOff, MoreVertical, Loader2, Video as VideoIcon } from "lucide-react";
@@ -65,7 +66,7 @@ function ProfilePage() {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["profile", "myVideos"] });
       queryClient2.invalidateQueries({ queryKey: ["feed", "infinite"] });
-      toast.success("Visibility updated");
+      toast.success(tr("Visibility updated", "Visibilidad actualizada"));
     },
     onError: (err) => toast.error((err as Error).message || "Could not update"),
   });
@@ -74,7 +75,7 @@ function ProfilePage() {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["profile", "myVideos"] });
       queryClient2.invalidateQueries({ queryKey: ["feed", "infinite"] });
-      toast.success("Video deleted");
+      toast.success(tr("Video deleted", "Vídeo borrado"));
     },
     onError: (err) => toast.error((err as Error).message || "Could not delete"),
   });
@@ -119,7 +120,7 @@ function ProfilePage() {
     queryClient.clear();
     await supabase.auth.signOut();
     auth.signOut();
-    toast.success("Signed out");
+    toast.success(tr("Signed out", "Sesión cerrada"));
     navigate({ to: "/auth", search: { redirect: "/" }, replace: true });
   }
 
@@ -168,8 +169,8 @@ function ProfilePage() {
             </button>
             <SheetContent side="bottom" className="rounded-t-3xl border-t border-border bg-background max-h-[90dvh] overflow-y-auto">
               <SheetHeader className="text-left">
-                <SheetTitle className="font-display text-2xl uppercase tracking-tight italic">Edit Profile</SheetTitle>
-                <SheetDescription>Update your public fighter info.</SheetDescription>
+                <SheetTitle className="font-display text-2xl uppercase tracking-tight italic">{tr("Edit Profile", "Editar perfil")}</SheetTitle>
+                <SheetDescription>{tr("Update your public fighter info.", "Actualiza tu información pública.")}</SheetDescription>
               </SheetHeader>
               <EditProfileForm onClose={() => setOpen(false)} />
             </SheetContent>
@@ -185,10 +186,10 @@ function ProfilePage() {
               alt={name}
               width={80}
               height={80}
-              className="size-20 rounded-2xl object-cover border-4 border-white/5"
+              className="size-20 rounded-2xl object-cover border-4 border-border"
             />
           ) : (
-            <div className="size-20 rounded-2xl border-4 border-white/5 bg-secondary flex items-center justify-center font-display text-3xl uppercase text-muted-foreground">
+            <div className="size-20 rounded-2xl border-4 border-border bg-secondary flex items-center justify-center font-display text-3xl uppercase text-muted-foreground">
               {(name || username || "?").slice(0, 1)}
             </div>
           )}
@@ -197,7 +198,7 @@ function ProfilePage() {
             <p className="text-xs font-mono text-muted-foreground">@{username}</p>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-accent font-mono text-xs font-bold">LVL {level}</span>
-              <div className="w-28 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="w-28 h-1.5 bg-secondary rounded-full overflow-hidden">
                 <div className="h-full bg-accent" style={{ width: `${xpPct}%` }} />
               </div>
               <span className="text-[10px] font-mono text-muted-foreground">{xp}/{xpToNext}</span>
@@ -208,7 +209,7 @@ function ProfilePage() {
         {bio ? (
           <p className="text-sm text-foreground/80 text-pretty">{bio}</p>
         ) : (
-          <p className="text-sm text-muted-foreground italic">Add a bio from Edit profile.</p>
+          <p className="text-sm text-muted-foreground italic">{tr("Add a bio from Edit profile.", "Añade una bio desde Editar perfil.")}</p>
         )}
 
         <div className="space-y-2">
@@ -239,7 +240,7 @@ function ProfilePage() {
             <div className="rounded-xl border border-border bg-card/50 p-3 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
-                  Belt timeline
+                  {tr("Belt timeline", "Historial de cinturones")}
                 </p>
                 <button
                   type="button"
@@ -284,8 +285,8 @@ function ProfilePage() {
 
         {/* Follow stats */}
         <div className="flex items-center gap-6 text-sm">
-          <div><span className="font-bold">{formatCount(followers)}</span> <span className="text-muted-foreground">followers</span></div>
-          <div><span className="font-bold">{formatCount(following)}</span> <span className="text-muted-foreground">following</span></div>
+          <div><span className="font-bold">{formatCount(followers)}</span> <span className="text-muted-foreground">{tr("followers", "seguidores")}</span></div>
+          <div><span className="font-bold">{formatCount(following)}</span> <span className="text-muted-foreground">{tr("following", "siguiendo")}</span></div>
         </div>
 
         {/* Stats */}
@@ -306,9 +307,9 @@ function ProfilePage() {
                 <Flame className="size-5 text-accent" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Private Training Tracker</p>
+                <p className="font-semibold text-sm">{tr("Private Training Tracker", "Tracker privado")}</p>
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                  <Lock className="size-3" /> Only visible to you
+                  <Lock className="size-3" /> {tr("Only visible to you", "Solo visible para ti")}
                 </p>
               </div>
             </div>
@@ -319,7 +320,7 @@ function ProfilePage() {
         {/* Badges */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-xl uppercase italic tracking-tight">Badges</h3>
+            <h3 className="font-display text-xl uppercase italic tracking-tight">{tr("Badges", "Insignias")}</h3>
             <span className="text-[10px] font-mono text-muted-foreground">
               {BADGES.filter((b) => earnedBadges[b.id]).length}/{BADGES.length}
             </span>
@@ -349,19 +350,19 @@ function ProfilePage() {
         {/* Your videos */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-xl uppercase italic tracking-tight">Your videos</h3>
+            <h3 className="font-display text-xl uppercase italic tracking-tight">{tr("Your videos", "Tus vídeos")}</h3>
             <span className="text-[10px] font-mono text-muted-foreground">
               {myVideosQ.data?.length ?? 0}
             </span>
           </div>
           {myVideosQ.isPending ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              <Loader2 className="size-4 inline animate-spin" /> Loading…
+              <Loader2 className="size-4 inline animate-spin" /> {tr("Loading…", "Cargando…")}
             </div>
           ) : !myVideosQ.data || myVideosQ.data.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-xl">
               <VideoIcon className="size-6 mx-auto mb-2 opacity-50" />
-              No videos yet. Upload one from the + button.
+              {tr("No videos yet. Upload one from the + button.", "Aún no hay vídeos. Sube uno con el botón +.")}
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2">
@@ -409,7 +410,7 @@ function MyVideoTile({
       </Link>
       {post.visibility === "private" && (
         <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono uppercase tracking-widest text-white flex items-center gap-1">
-          <EyeOff className="size-2.5" /> Private
+          <EyeOff className="size-2.5" /> {tr("Private", "Privado")}
         </div>
       )}
       <button
@@ -436,9 +437,9 @@ function MyVideoTile({
               className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-xs hover:bg-secondary disabled:opacity-50"
             >
               {post.visibility === "public" ? (
-                <><EyeOff className="size-3.5" /> Make private</>
+                <><EyeOff className="size-3.5" /> {tr("Make private", "Hacer privado")}</>
               ) : (
-                <><Eye className="size-3.5" /> Make public</>
+                <><Eye className="size-3.5" /> {tr("Make public", "Hacer público")}</>
               )}
             </button>
             <button
@@ -449,7 +450,7 @@ function MyVideoTile({
               disabled={busy}
               className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-xs text-destructive hover:bg-destructive/10 disabled:opacity-50"
             >
-              <Trash2 className="size-3.5" /> Delete
+              <Trash2 className="size-3.5" /> {tr("Delete", "Borrar")}
             </button>
           </div>
         </>
@@ -646,7 +647,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={() => !avatarBusy && fileRef.current?.click()}
           disabled={avatarBusy}
-          className="relative size-20 rounded-2xl overflow-hidden border-4 border-white/5 bg-secondary group"
+          className="relative size-20 rounded-2xl overflow-hidden border-4 border-border bg-secondary group"
         >
           {avatar ? (
             <img src={avatar} alt="Avatar preview" className="size-full object-cover" />
@@ -668,7 +669,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
           )}
         </button>
         <div className="flex-1">
-          <p className="text-sm font-semibold">Profile Photo</p>
+          <p className="text-sm font-semibold">{tr("Profile Photo", "Foto de perfil")}</p>
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">Tap image to upload (max 3MB)</p>
           {avatar && (
             <button
@@ -676,7 +677,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
               onClick={() => setAvatar(undefined)}
               className="mt-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground underline"
             >
-              Remove
+              {tr("Remove", "Quitar")}
             </button>
           )}
         </div>
@@ -721,7 +722,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
         />
       </Field>
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Skill Level</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Skill Level", "Nivel")}</span>
         <div className="grid grid-cols-3 gap-2">
           {LEVELS.map((l) => {
             const sel = level === l;
@@ -743,7 +744,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Disciplines</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Disciplines", "Disciplinas")}</span>
         <div className="flex flex-wrap gap-2">
           {ARTS.map((a) => {
             const sel = arts.includes(a);
@@ -765,7 +766,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Content Preferences</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Content Preferences", "Preferencias de contenido")}</span>
         <div className="flex flex-wrap gap-2">
           {CONTENT_PREFS.map((p) => {
             const sel = prefs.includes(p);
@@ -790,7 +791,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
       {arts.length > 0 && (
         <div className="space-y-3">
           <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-            Rank per Discipline
+            {tr("Rank per Discipline", "Rango por disciplina")}
           </span>
           <div className="space-y-3">
             {arts.map((a) => {
@@ -908,7 +909,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
           disabled={saving}
           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-secondary text-secondary-foreground font-bold uppercase tracking-wider text-sm active:scale-[0.98] transition-transform"
         >
-          <X className="size-4" /> Cancel
+          <X className="size-4" /> {tr("Cancel", "Cancelar")}
         </button>
         <button
           onClick={save}
@@ -1004,7 +1005,7 @@ function BeltHistoryEditor({
   return (
     <div className="pt-2 border-t border-border space-y-2">
       <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">
-        Belt history
+        {tr("Belt history", "Historial de cinturones")}
       </p>
       {history.length > 0 && (
         <ul className="space-y-1">
@@ -1033,7 +1034,7 @@ function BeltHistoryEditor({
           onChange={(e) => setNewBelt(e.target.value)}
           className="profile-input flex-1 py-2 text-xs"
         >
-          <option value="">Belt…</option>
+          <option value="">{tr("Belt…", "Cinturón…")}</option>
           {belts.map((b, i) => {
             const dupBelt = usedBelts.has(b);
             const demote = lastBeltIdx >= 0 && i < lastBeltIdx;

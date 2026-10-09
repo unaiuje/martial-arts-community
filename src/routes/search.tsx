@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, ChevronRight } from "lucide-react";
@@ -76,7 +77,7 @@ function SearchPage() {
       <div className="space-y-6 animate-snap-in">
         <header className="space-y-3">
           <div className="flex items-center justify-between">
-            <h1 className="font-display text-4xl uppercase tracking-tight italic">Search</h1>
+            <h1 className="font-display text-4xl uppercase tracking-tight italic">{tr("Search", "Buscar")}</h1>
             <Link to="/suggestions" className="text-[11px] font-bold uppercase px-3 py-1.5 rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground">
               💡 Suggest
             </Link>
@@ -128,7 +129,7 @@ function SearchPage() {
           ))}
           {results.length === 0 && (
             <p className="col-span-2 text-center text-sm text-muted-foreground py-12">
-              No results. Try a different technique.
+              {tr("No results. Try a different technique.", "Sin resultados. Prueba otra técnica.")}
             </p>
           )}
           </section>
@@ -174,7 +175,7 @@ function SearchPage() {
                 {(coachesQ.data ?? []).length > 0 && (
                   <div className="space-y-2 pb-2">
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                      BJJ Coaches
+                      {tr("BJJ Coaches", "Entrenadores de BJJ")}
                     </p>
                     <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5">
                       {coachesQ.data!.map((c) => (
@@ -197,10 +198,10 @@ function SearchPage() {
                   </div>
                 )}
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                  Categories
+                  {tr("Categories", "Categorías")}
                 </p>
                 {categoriesQ.isLoading ? (
-                  <p className="text-sm text-muted-foreground">Loading…</p>
+                  <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>
                 ) : (
                   <ul className="space-y-2">
                     {(categoriesQ.data ?? []).map((c) => (

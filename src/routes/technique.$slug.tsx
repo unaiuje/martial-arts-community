@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play } from "lucide-react";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/technique/$slug")({
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">{error instanceof Error ? error.message : String(error)}</div>
   ),
-  notFoundComponent: () => <div className="p-6 text-sm">Technique not found.</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{tr("Technique not found.", "Técnica no encontrada.")}</div>,
 });
 
 function TechniquePage() {
@@ -39,12 +40,12 @@ function TechniquePage() {
           onClick={() => router.history.back()}
           className="flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <ArrowLeft className="size-3.5" /> Back
+          <ArrowLeft className="size-3.5" /> {tr("Back", "Volver")}
         </button>
         {info.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>
         ) : !info.data ? (
-          <p className="text-sm text-muted-foreground">Technique not found.</p>
+          <p className="text-sm text-muted-foreground">{tr("Technique not found.", "Técnica no encontrada.")}</p>
         ) : (
           <>
             <header className="space-y-1">
@@ -67,10 +68,10 @@ function TechniquePage() {
 
             <section>
               {videos.isLoading ? (
-                <p className="text-sm text-muted-foreground">Loading videos…</p>
+                <p className="text-sm text-muted-foreground">{tr("Loading videos…", "Cargando vídeos…")}</p>
               ) : !videos.data?.length ? (
                 <p className="text-sm text-muted-foreground py-8 text-center">
-                  No videos yet with this technique. Be the first to upload one.
+                  {tr("No videos yet with this technique. Be the first to upload one.", "Aún no hay vídeos de esta técnica. Sé el primero en subir uno.")}
                 </p>
               ) : (
                 <div className="grid grid-cols-2 gap-3">

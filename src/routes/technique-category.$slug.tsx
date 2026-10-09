@@ -1,3 +1,4 @@
+import { tr } from "@/lib/i18n";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight } from "lucide-react";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/technique-category/$slug")({
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">{error instanceof Error ? error.message : String(error)}</div>
   ),
-  notFoundComponent: () => <div className="p-6 text-sm">Category not found.</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{tr("Category not found.", "Categoría no encontrada.")}</div>,
 });
 
 function CategoryPage() {
@@ -35,12 +36,12 @@ function CategoryPage() {
           onClick={() => router.history.back()}
           className="flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <ArrowLeft className="size-3.5" /> Back
+          <ArrowLeft className="size-3.5" /> {tr("Back", "Volver")}
         </button>
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>
         ) : !data ? (
-          <p className="text-sm text-muted-foreground">Category not found.</p>
+          <p className="text-sm text-muted-foreground">{tr("Category not found.", "Categoría no encontrada.")}</p>
         ) : (
           <>
             <header className="space-y-1">
