@@ -171,7 +171,7 @@ function Onboarding() {
             {steps.map((_, i) => (
               <div
                 key={i}
-                className={`h-1 flex-1 rounded-full ${i <= step ? "bg-accent" : "bg-white/10"}`}
+                className={`h-1 flex-1 rounded-full ${i <= step ? "bg-accent" : "bg-secondary"}`}
               />
             ))}
           </div>
@@ -180,7 +180,7 @@ function Onboarding() {
               <span>{t("onb.progress")}</span>
               <span className="text-accent">{percent}%</span>
             </div>
-            <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+            <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
               <div
                 className="h-full bg-accent transition-all duration-300"
                 style={{ width: `${percent}%` }}

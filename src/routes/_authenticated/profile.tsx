@@ -185,10 +185,10 @@ function ProfilePage() {
               alt={name}
               width={80}
               height={80}
-              className="size-20 rounded-2xl object-cover border-4 border-white/5"
+              className="size-20 rounded-2xl object-cover border-4 border-border"
             />
           ) : (
-            <div className="size-20 rounded-2xl border-4 border-white/5 bg-secondary flex items-center justify-center font-display text-3xl uppercase text-muted-foreground">
+            <div className="size-20 rounded-2xl border-4 border-border bg-secondary flex items-center justify-center font-display text-3xl uppercase text-muted-foreground">
               {(name || username || "?").slice(0, 1)}
             </div>
           )}
@@ -197,7 +197,7 @@ function ProfilePage() {
             <p className="text-xs font-mono text-muted-foreground">@{username}</p>
             <div className="flex items-center gap-2 mt-2">
               <span className="text-accent font-mono text-xs font-bold">LVL {level}</span>
-              <div className="w-28 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="w-28 h-1.5 bg-secondary rounded-full overflow-hidden">
                 <div className="h-full bg-accent" style={{ width: `${xpPct}%` }} />
               </div>
               <span className="text-[10px] font-mono text-muted-foreground">{xp}/{xpToNext}</span>
@@ -646,7 +646,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={() => !avatarBusy && fileRef.current?.click()}
           disabled={avatarBusy}
-          className="relative size-20 rounded-2xl overflow-hidden border-4 border-white/5 bg-secondary group"
+          className="relative size-20 rounded-2xl overflow-hidden border-4 border-border bg-secondary group"
         >
           {avatar ? (
             <img src={avatar} alt="Avatar preview" className="size-full object-cover" />
