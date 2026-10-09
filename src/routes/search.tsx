@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, ChevronRight } from "lucide-react";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/search")({
 });
 
 function SearchPage() {
+  useLangSubscription();
   const [q, setQ] = useState("");
   const [art, setArt] = useState<string | null>(null);
   const [tab, setTab] = useState<"videos" | "techniques">("videos");
@@ -233,6 +234,7 @@ function SearchPage() {
 }
 
 function Chip({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  useLangSubscription();
   return (
     <button
       onClick={onClick}

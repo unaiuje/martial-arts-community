@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute } from "@tanstack/react-router";
 import { MessageCircle, CheckCircle2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/duels")({
 });
 
 function DuelsPage() {
+  useLangSubscription();
   const queryClient = useQueryClient();
   const { user: authUser } = useSupabaseUser();
 

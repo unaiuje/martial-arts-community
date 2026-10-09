@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { Lock, Flame, Award, Pencil, X, Check, Camera, Plus, Trash2, Download, LogOut, Eye, EyeOff, MoreVertical, Loader2, Video as VideoIcon } from "lucide-react";
@@ -39,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 function ProfilePage() {
+  useLangSubscription();
   const user = useUser();
   const { user: authUser, profile } = useSupabaseUser();
   const navigate = useNavigate();
@@ -463,6 +464,7 @@ function MyVideoTile({
 }
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  useLangSubscription();
   return (
     <div className="bg-card border border-border p-4 rounded-2xl">
       <p className="text-[10px] font-mono text-muted-foreground uppercase mb-1">{label}</p>
@@ -474,6 +476,7 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 }
 
 function EditProfileForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const user = useUser();
   const t = useT();
   const { user: authUser } = useSupabaseUser();
@@ -943,6 +946,7 @@ function EditProfileForm({ onClose }: { onClose: () => void }) {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <label className="block space-y-1.5">
       <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{label}</span>
@@ -1087,6 +1091,7 @@ function SummaryCell({
   sub?: string;
   accent?: boolean;
 }) {
+  useLangSubscription();
   return (
     <div className="bg-secondary/60 border border-border rounded-lg p-2">
       <p className="text-[8px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>

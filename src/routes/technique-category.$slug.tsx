@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight } from "lucide-react";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/technique-category/$slug")({
 });
 
 function CategoryPage() {
+  useLangSubscription();
   const { slug } = Route.useParams();
   const router = useRouter();
   const [giMode, setGiMode] = useGiMode();

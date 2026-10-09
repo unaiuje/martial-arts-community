@@ -1,4 +1,4 @@
-import { Fragment, createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "es";
 
@@ -185,6 +185,11 @@ const KEY = "strive-lang";
 
 let currentLang: Lang = "en";
 /** Bilingual string usable anywhere (components, toasts): tr("English", "Español"). */
+/** Subscribe a component to language changes so its tr() calls re-render without losing state. */
+export function useLangSubscription() {
+  return useContext(I18nCtx).lang;
+}
+
 export function tr(en: string, es: string): string {
   return currentLang === "es" ? es : en;
 }
@@ -216,12 +221,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
   const t = (k: TKey) => dict[lang][k] ?? dict.en[k] ?? k;
   currentLang = lang;
-  // Remount the tree on language change so every tr() call re-evaluates.
-  return (
-    <I18nCtx.Provider value={{ lang, setLang, t }}>
-      <Fragment key={lang}>{children}</Fragment>
-    </I18nCtx.Provider>
-  );
+  return <I18nCtx.Provider value={{ lang, setLang, t }}>{children}</I18nCtx.Provider>;
 }
 
 export function useI18n() {

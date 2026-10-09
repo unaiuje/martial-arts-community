@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import {
@@ -106,6 +106,7 @@ function captureCover(video: HTMLVideoElement, yOffset: number): Promise<Blob> {
 }
 
 function UploadProgressBar({ progress, label }: { progress: number; label: string }) {
+  useLangSubscription();
   const pct = Math.round(progress * 100);
   return (
     <div className="space-y-1">
@@ -150,6 +151,7 @@ const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: s
 ];
 
 function CreatePage() {
+  useLangSubscription();
   const [open, setOpen] = useState<ActionKey | null>(null);
 
   return (
@@ -200,6 +202,7 @@ function CreatePage() {
 // ---------- shared bits ----------
 
 function FormHeader({ title, desc }: { title: string; desc: string }) {
+  useLangSubscription();
   return (
     <SheetHeader className="text-left">
       <SheetTitle className="font-display text-2xl uppercase tracking-tight italic">{title}</SheetTitle>
@@ -209,6 +212,7 @@ function FormHeader({ title, desc }: { title: string; desc: string }) {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <label className="block space-y-1.5">
       <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{label}</span>
@@ -282,6 +286,7 @@ function ChipGrid<T extends string>({
 // ---------- Preview components ----------
 
 function PreviewLabel({ children }: { children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <div className="flex items-center gap-2 text-[10px] font-mono text-accent uppercase tracking-widest">
       <Eye className="size-3.5" />
@@ -291,6 +296,7 @@ function PreviewLabel({ children }: { children: React.ReactNode }) {
 }
 
 function MobilePreviewFrame({ children }: { children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="bg-secondary/50 px-3 py-2 border-b border-border flex items-center justify-center gap-1.5">
@@ -306,6 +312,7 @@ function MobilePreviewFrame({ children }: { children: React.ReactNode }) {
 // ---------- 1. Upload Video ----------
 
 function UploadVideoForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const user = useUser();
 
   // Local file + backend upload state
@@ -873,6 +880,7 @@ function VideoPreview({
   level: string;
   poster?: string;
 }) {
+  useLangSubscription();
   return (
     <div className="relative aspect-[9/16] bg-black overflow-hidden">
       <div
@@ -962,6 +970,7 @@ function VideoPreview({
 // ---------- 2. Start a Duel ----------
 
 function DuelForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const user = useUser();
   const myHandle = user?.username ? `@${user.username}` : "@you";
   const [title, setTitle] = useState("");
@@ -1181,6 +1190,7 @@ function DuelPreview({
   a: { handle: string; poster?: string };
   b: { handle: string; poster?: string };
 }) {
+  useLangSubscription();
   const fallback = "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=800";
   return (
     <div className="p-4 space-y-3 bg-background">
@@ -1230,6 +1240,7 @@ function DuelPreview({
 // ---------- 3. Log Training ----------
 
 function TrainingForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
@@ -1348,6 +1359,7 @@ function TrainingPreview({
   notes?: string;
   completed: boolean;
 }) {
+  useLangSubscription();
   const d = new Date(date);
   return (
     <div className="p-4 bg-background space-y-2">
@@ -1384,6 +1396,7 @@ function TrainingPreview({
 // ---------- 4. Set a Goal ----------
 
 function GoalForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [target, setTarget] = useState("");
@@ -1443,6 +1456,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
 }
 
 function GoalPreview({ title, target, progress }: { title: string; target: string; progress: number }) {
+  useLangSubscription();
   return (
     <div className="p-4 bg-background">
       <div className="bg-card border border-border rounded-xl p-4 space-y-2.5">
@@ -1465,6 +1479,7 @@ function GoalPreview({ title, target, progress }: { title: string; target: strin
 // ---------- 5. Post Achievement ----------
 
 function AchievementForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const today = new Date().toISOString().slice(0, 10);
   const [kind, setKind] = useState<"promotion" | "competition" | "milestone">("promotion");
   const [title, setTitle] = useState("");
@@ -1550,6 +1565,7 @@ function AchievementPreview({
   detail?: string;
   date: string;
 }) {
+  useLangSubscription();
   const icons = {
     promotion: <TrendingUp className="size-5 text-accent" />,
     competition: <Trophy className="size-5 text-accent" />,
@@ -1589,6 +1605,7 @@ function AchievementPreview({
 }
 
 function FormStyles() {
+  useLangSubscription();
   return (
     <style>{`
       .profile-input {
