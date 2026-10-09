@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play } from "lucide-react";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/technique/$slug")({
 });
 
 function TechniquePage() {
+  useLangSubscription();
   const { slug } = Route.useParams();
   const router = useRouter();
   const info = useQuery({

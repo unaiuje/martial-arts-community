@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -59,6 +59,7 @@ export const Route = createFileRoute("/")({
 });
 
 function FeedPage() {
+  useLangSubscription();
   const queryClient = useQueryClient();
   const { online, justReconnected } = useOnlineStatus();
   const { user: authUser } = useSupabaseUser();
@@ -323,6 +324,7 @@ function FeedPage() {
 }
 
 function ConnectionBanner({ online, justReconnected }: { online: boolean; justReconnected: boolean }) {
+  useLangSubscription();
   if (online && !justReconnected) return null;
   const isOffline = !online;
   return (
@@ -342,6 +344,7 @@ function ConnectionBanner({ online, justReconnected }: { online: boolean; justRe
 }
 
 function FeedSkeleton() {
+  useLangSubscription();
   return (
     <div className="h-[100dvh] w-full bg-background relative overflow-hidden">
       <Skeleton className="absolute inset-0 rounded-none bg-muted" />
@@ -369,6 +372,7 @@ function FeedSkeleton() {
 }
 
 function FeedEmpty({ onRetry }: { onRetry: () => void }) {
+  useLangSubscription();
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-8 text-center bg-background text-foreground">
       <Inbox className="size-12 text-muted-foreground mb-4" />
@@ -886,6 +890,7 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 function AuthorBadge({ userId, handle, art, level }: { userId: string | null; handle: string; art: string; level: string }) {
+  useLangSubscription();
   const miniQ = useQuery({
     queryKey: ["profile-mini", userId],
     queryFn: () => fetchProfileMini(userId!),
@@ -915,6 +920,7 @@ function AuthorBadge({ userId, handle, art, level }: { userId: string | null; ha
 }
 
 function FeedArtFilter({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+  useLangSubscription();
   const opts: (string | null)[] = [null, ...ARTS];
   return (
     <div className="absolute top-14 inset-x-0 z-20 flex gap-2 overflow-x-auto no-scrollbar px-4 pointer-events-auto" aria-label="Filter by martial art">

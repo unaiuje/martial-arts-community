@@ -1,4 +1,4 @@
-import { tr } from "@/lib/i18n";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "@tanstack/react-router";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/tracker")({
 });
 
 function TrackerErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
+  useLangSubscription();
   const router = useRouter();
   const inc = useMemo(
     () => logIncident(error, { route: "/tracker", scope: "route-error" }),
@@ -60,6 +61,7 @@ function TrackerErrorBoundary({ error, reset }: { error: Error; reset: () => voi
 }
 
 function TrackerNotFound() {
+  useLangSubscription();
   useEffect(() => {
     const inc = logIncident("Tracker route not found", { route: "/tracker", scope: "route-not-found" });
     console.warn(`[tracker] not found (${inc.id})`);
@@ -73,6 +75,7 @@ function TrackerNotFound() {
 }
 
 function TrackerPage() {
+  useLangSubscription();
   const sessions = useStore((s) => s.sessions);
   const goals = useStore((s) => s.goals);
   const schedule = useStore((s) => s.schedule);
@@ -467,6 +470,7 @@ function TrackerPage() {
 }
 
 function PrivateGate() {
+  useLangSubscription();
   return (
     <MobileShell>
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-6 animate-snap-in px-4">
@@ -491,6 +495,7 @@ function PrivateGate() {
 }
 
 function MiniStat({ label, value }: { label: string; value: string }) {
+  useLangSubscription();
   return (
     <div>
       <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
@@ -502,6 +507,7 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 }
 
 function Recap({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  useLangSubscription();
   return (
     <div className="bg-card border border-border p-4 rounded-2xl">
       <p className="text-[10px] font-mono text-muted-foreground uppercase mb-1">{label}</p>
@@ -513,6 +519,7 @@ function Recap({ label, value, accent }: { label: string; value: string; accent?
 }
 
 function StreakCard({ sessions, streak }: { sessions: TrainingSession[]; streak: number }) {
+  useLangSubscription();
   const last = lastTrainingDate(sessions);
   const todayKey = localDayKey(new Date());
   const yest = new Date();
@@ -559,6 +566,7 @@ function StreakCard({ sessions, streak }: { sessions: TrainingSession[]; streak:
 }
 
 function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initialDate: string }) {
+  useLangSubscription();
   const [art, setArt] = useState<Art>("BJJ");
   const [duration, setDuration] = useState(60);
   const [effort, setEffort] = useState(7);
@@ -775,6 +783,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <div className="space-y-2">
       <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
