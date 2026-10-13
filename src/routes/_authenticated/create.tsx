@@ -1,3 +1,4 @@
+import { useDraft } from "@/hooks/use-draft";
 import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
@@ -337,13 +338,13 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
   const [posterProgress, setPosterProgress] = useState(0);
   const [posterUploading, setPosterUploading] = useState(false);
 
-  const [caption, setCaption] = useState("");
-  const [art, setArt] = useState<Art | null>(null);
-  const [level, setLevel] = useState<(typeof LEVELS)[number] | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  const [caption, setCaption] = useDraft("create.caption", "");
+  const [art, setArt] = useDraft<Art | null>("create.art", null);
+  const [level, setLevel] = useDraft<(typeof LEVELS)[number] | null>("create.level", null);
+  const [tags, setTags] = useDraft<string[]>("create.tags", []);
+  const [tagInput, setTagInput] = useDraft("create.tagInput", "");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [selectedTechniqueIds, setSelectedTechniqueIds] = useState<string[]>([]);
+  const [selectedTechniqueIds, setSelectedTechniqueIds] = useDraft<string[]>("create.techniques", []);
   const [dragOver, setDragOver] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const techQuery = useQuery({
@@ -973,10 +974,10 @@ function DuelForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const user = useUser();
   const myHandle = user?.username ? `@${user.username}` : "@you";
-  const [title, setTitle] = useState("");
-  const [technique, setTechnique] = useState("");
+  const [title, setTitle] = useDraft("duel.title", "");
+  const [technique, setTechnique] = useDraft("duel.technique", "");
   const [aHandle, setAHandle] = useState(myHandle);
-  const [bHandle, setBHandle] = useState("");
+  const [bHandle, setBHandle] = useDraft("duel.bHandle", "");
   const [a, setA] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [b, setB] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [publishing, setPublishing] = useState(false);
@@ -1247,7 +1248,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
   const [art, setArt] = useState<Art | null>(null);
   const [duration, setDuration] = useState("60");
   const [effort, setEffort] = useState(7);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useDraft("createSession.notes", "");
   const [completed, setCompleted] = useState(true);
 
   const valid = !!date && !!art && Number(duration) > 0;
@@ -1398,8 +1399,8 @@ function TrainingPreview({
 function GoalForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [target, setTarget] = useState("");
+  const [title, setTitle] = useDraft("goal.title", "");
+  const [target, setTarget] = useDraft("goal.target", "");
   const [progress, setProgress] = useState(0);
 
   const valid = !!title.trim() && !!target.trim();
@@ -1482,8 +1483,8 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const today = new Date().toISOString().slice(0, 10);
   const [kind, setKind] = useState<"promotion" | "competition" | "milestone">("promotion");
-  const [title, setTitle] = useState("");
-  const [detail, setDetail] = useState("");
+  const [title, setTitle] = useDraft("achievement.title", "");
+  const [detail, setDetail] = useDraft("achievement.detail", "");
   const [date, setDate] = useState(today);
 
   const valid = !!title.trim() && !!date;

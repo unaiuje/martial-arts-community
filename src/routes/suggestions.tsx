@@ -1,3 +1,4 @@
+import { useDraft } from "@/hooks/use-draft";
 import { useTr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -35,8 +36,8 @@ function SuggestionsPage() {
   const { user } = useSupabaseUser();
   const qc = useQueryClient();
   const isAdmin = useIsAdmin();
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useDraft("suggestion.title", "");
+  const [body, setBody] = useDraft("suggestion.body", "");
   const [category, setCategory] = useState<string>("feature");
   const [sort, setSort] = useState<"top" | "new">("top");
   const [busy, setBusy] = useState(false);
