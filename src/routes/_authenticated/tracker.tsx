@@ -1,3 +1,4 @@
+import { useDraft, clearDraft } from "@/hooks/use-draft";
 import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
@@ -570,11 +571,11 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
   const [art, setArt] = useState<Art>("BJJ");
   const [duration, setDuration] = useState(60);
   const [effort, setEffort] = useState(7);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useDraft("tracker.notes", "");
   const [date, setDate] = useState(initialDate);
   const [completed, setCompleted] = useState(true);
-  const [activity, setActivity] = useState("");
-  const [stravaUrl, setStravaUrl] = useState("");
+  const [activity, setActivity] = useDraft("tracker.activity", "");
+  const [stravaUrl, setStravaUrl] = useDraft("tracker.strava", "");
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined);
   const [photoThumb, setPhotoThumb] = useState<string | undefined>(undefined);
   const [photoMeta, setPhotoMeta] = useState<{ w: number; h: number; kb: number } | null>(null);
@@ -605,6 +606,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
       toast.error(tr("Strava link must start with http(s)://", "El enlace de Strava debe empezar por http(s)://"));
       return;
     }
+    clearDraft("tracker.notes", "tracker.activity", "tracker.strava");
     actions.addSession({
       art,
       durationMin: duration,

@@ -1,3 +1,4 @@
+import { useDraft, clearDraft } from "@/hooks/use-draft";
 import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
@@ -142,17 +143,17 @@ function stageLabel(stage: string): string {
   }
 }
 
-const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string }[] = [
-  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip" },
-  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other" },
-  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker" },
-  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones" },
-  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone" },
+const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string; titleEs: string; descEs: string }[] = [
+  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip", titleEs: "Subir vídeo", descEs: "Comparte una técnica o clip de entreno" },
+  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other", titleEs: "Crear un duelo", descEs: "Enfrenta dos ejecuciones" },
+  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker", titleEs: "Registrar entreno", descEs: "Añade una sesión a tu tracker privado" },
+  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones", titleEs: "Fijar un objetivo", descEs: "Sigue tu progreso con metas semanales" },
+  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone", titleEs: "Publicar un logro", descEs: "Cinturón, competición, hito" },
 ];
 
 function CreatePage() {
   useLangSubscription();
-  const [open, setOpen] = useState<ActionKey | null>(null);
+  const [open, setOpen] = useDraft<ActionKey | null>("create.open", null);
 
   return (
     <MobileShell>
@@ -337,13 +338,13 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
   const [posterProgress, setPosterProgress] = useState(0);
   const [posterUploading, setPosterUploading] = useState(false);
 
-  const [caption, setCaption] = useState("");
-  const [art, setArt] = useState<Art | null>(null);
-  const [level, setLevel] = useState<(typeof LEVELS)[number] | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  const [caption, setCaption] = useDraft("create.caption", "");
+  const [art, setArt] = useDraft<Art | null>("create.art", null);
+  const [level, setLevel] = useDraft<(typeof LEVELS)[number] | null>("create.level", null);
+  const [tags, setTags] = useDraft<string[]>("create.tags", []);
+  const [tagInput, setTagInput] = useDraft("create.tagInput", "");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [selectedTechniqueIds, setSelectedTechniqueIds] = useState<string[]>([]);
+  const [selectedTechniqueIds, setSelectedTechniqueIds] = useDraft<string[]>("create.techniques", []);
   const [dragOver, setDragOver] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const techQuery = useQuery({
@@ -529,6 +530,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           toast.error(`Video published but techniques failed: ${(e as Error).message}`);
         }
       }
+      clearDraft("create.open","create.caption","create.art","create.level","create.tags","create.tagInput","create.techniques");
       toast.success(tr("Video published to your feed", "Vídeo publicado en tu feed"));
       onClose();
     } catch (e) {
@@ -540,7 +542,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Upload Video" desc="Share a clip with the community." />
+      <FormHeader title={tr("Upload Video", "Subir vídeo")} desc={tr("Share a clip with the community.", "Comparte un clip con la comunidad.")} />
       <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
         {/* Small 9:16 preview on the left, TikTok-style */}
         <div className="space-y-1.5">
@@ -973,10 +975,10 @@ function DuelForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const user = useUser();
   const myHandle = user?.username ? `@${user.username}` : "@you";
-  const [title, setTitle] = useState("");
-  const [technique, setTechnique] = useState("");
+  const [title, setTitle] = useDraft("duel.title", "");
+  const [technique, setTechnique] = useDraft("duel.technique", "");
   const [aHandle, setAHandle] = useState(myHandle);
-  const [bHandle, setBHandle] = useState("");
+  const [bHandle, setBHandle] = useDraft("duel.bHandle", "");
   const [a, setA] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [b, setB] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [publishing, setPublishing] = useState(false);
@@ -1045,6 +1047,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
         aPosterPath: a.upload.path,
         bPosterPath: b.upload.path,
       });
+      clearDraft("duel.title","duel.technique","duel.bHandle");
       toast.success(tr("Duel started — voting is live", "Duelo creado — la votación está abierta"));
       onClose();
     } catch (e) {
@@ -1056,7 +1059,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Start a Duel" desc="Pit two executions head-to-head." />
+      <FormHeader title={tr("Start a Duel", "Crear un duelo")} desc={tr("Pit two executions head-to-head.", "Enfrenta dos ejecuciones cara a cara.")} />
       <Field label="Title">
         <input value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))} placeholder={tr("Which armbar is cleaner?", "¿Qué armbar es más limpio?")} className="profile-input" />
       </Field>
@@ -1247,7 +1250,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
   const [art, setArt] = useState<Art | null>(null);
   const [duration, setDuration] = useState("60");
   const [effort, setEffort] = useState(7);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useDraft("createSession.notes", "");
   const [completed, setCompleted] = useState(true);
 
   const valid = !!date && !!art && Number(duration) > 0;
@@ -1270,7 +1273,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Log Training" desc="Add a session to your private tracker." />
+      <FormHeader title={tr("Log Training", "Registrar entreno")} desc={tr("Add a session to your private tracker.", "Añade una sesión a tu tracker privado.")} />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Date">
           <input type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} className="profile-input" />
@@ -1398,8 +1401,8 @@ function TrainingPreview({
 function GoalForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [target, setTarget] = useState("");
+  const [title, setTitle] = useDraft("goal.title", "");
+  const [target, setTarget] = useDraft("goal.target", "");
   const [progress, setProgress] = useState(0);
 
   const valid = !!title.trim() && !!target.trim();
@@ -1407,6 +1410,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addGoal({ title: title.trim(), target: target.trim(), progress });
+    clearDraft("goal.title","goal.target");
     toast.success(tr("Goal added", "Objetivo añadido"), {
       action: { label: "Open tracker", onClick: () => navigate({ to: "/tracker" }) },
     });
@@ -1415,7 +1419,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Set a Goal" desc="Track weekly or long-term milestones." />
+      <FormHeader title={tr("Set a Goal", "Fijar un objetivo")} desc={tr("Track weekly or long-term milestones.", "Sigue metas semanales o a largo plazo.")} />
       <Field label="Goal">
         <input
           value={title}
@@ -1482,8 +1486,8 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
   useLangSubscription();
   const today = new Date().toISOString().slice(0, 10);
   const [kind, setKind] = useState<"promotion" | "competition" | "milestone">("promotion");
-  const [title, setTitle] = useState("");
-  const [detail, setDetail] = useState("");
+  const [title, setTitle] = useDraft("achievement.title", "");
+  const [detail, setDetail] = useDraft("achievement.detail", "");
   const [date, setDate] = useState(today);
 
   const valid = !!title.trim() && !!date;
@@ -1491,6 +1495,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addAchievement({ kind, title: title.trim(), detail: detail.trim() || undefined, date });
+    clearDraft("achievement.title","achievement.detail");
     toast.success(tr("Achievement posted", "Logro publicado"));
     onClose();
   };
@@ -1503,7 +1508,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Post Achievement" desc="Belt promotion, competition, or milestone." />
+      <FormHeader title={tr("Post Achievement", "Publicar logro")} desc={tr("Belt promotion, competition, or milestone.", "Cinturón, competición o hito.")} />
       <div className="flex gap-2">
         {kinds.map((k) => {
           const sel = kind === k.id;
