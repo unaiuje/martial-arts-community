@@ -48,15 +48,14 @@ export function uploadMedia(
   const type = opts.contentType || (file as File).type || "application/octet-stream";
   const ext = extFromType(type, opts.folder === "videos" ? "mp4" : "jpg");
   const base = (opts.filename || randomId()).replace(/[^a-zA-Z0-9._-]/g, "_");
-  const path = `${opts.folder}/${randomId()}-${base}.${ext}`;
-  const endpoint = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
-
-  // Use the current user's access token when available — storage RLS evaluates
-  // policies against the JWT, and some networks/CDNs reject raw-body POST
-  // uploads carrying only the anon key.
+  // Storage rules only let a user write inside `<folder>/<their user id>/`.
   return (async () => {
     const { data: sess } = await supabase.auth.getSession();
-    const token = sess.session?.access_token || SUPABASE_KEY;
+    const uid = sess.session?.user.id;
+    if (!uid) throw new Error("AUTH_REQUIRED");
+    const token = sess.session!.access_token;
+    const path = `${opts.folder}/${uid}/${randomId()}-${base}.${ext}`;
+    const endpoint = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
     return new Promise<UploadResult>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       // PUT + x-upsert is the documented update path and is more reliable

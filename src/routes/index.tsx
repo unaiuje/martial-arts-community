@@ -1,3 +1,4 @@
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -22,7 +23,7 @@ import {
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
-import { formatCount } from "@/lib/mock-data";
+import { ARTS, formatCount } from "@/lib/mock-data";
 import { actions, useStore } from "@/lib/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
@@ -58,6 +59,7 @@ export const Route = createFileRoute("/")({
 });
 
 function FeedPage() {
+  useLangSubscription();
   const queryClient = useQueryClient();
   const { online, justReconnected } = useOnlineStatus();
   const { user: authUser } = useSupabaseUser();
@@ -87,10 +89,24 @@ function FeedPage() {
     }
   }, [justReconnected, queryClient]);
 
-  const feed = useMemo<FeedItem[]>(
+  const [artFilter, setArtFilter] = useState<string | null>(null);
+  const allFeed = useMemo<FeedItem[]>(
     () => (feedQ.data?.pages ?? []).flat(),
     [feedQ.data],
   );
+  const feed = useMemo<FeedItem[]>(
+    () =>
+      artFilter
+        ? allFeed.filter((p) => p.art.toLowerCase() === artFilter.toLowerCase())
+        : allFeed,
+    [allFeed, artFilter],
+  );
+  // With a filter active, keep paging until something matches (or we run out).
+  useEffect(() => {
+    if (artFilter && feed.length < 2 && feedQ.hasNextPage && !feedQ.isFetchingNextPage) {
+      feedQ.fetchNextPage();
+    }
+  }, [artFilter, feed.length, feedQ]);
 
   // Fetch which posts the user already liked / follows, in batch per page.
   const visibleIds = useMemo(() => feed.map((p) => p.id), [feed]);
@@ -187,7 +203,7 @@ function FeedPage() {
     onError: (err, _vars, ctx) => {
       if (ctx?.key) queryClient.setQueryData(ctx.key, ctx.prev);
       const msg = (err as Error).message;
-      if (msg === "AUTH_REQUIRED") toast.error("Sign in to like posts");
+      if (msg === "AUTH_REQUIRED") toast.error(tr("Sign in to like posts", "Inicia sesión para dar like"));
       else toastError(err, "feed_like", "Could not like");
     },
     onSuccess: () => {
@@ -213,7 +229,7 @@ function FeedPage() {
     onError: (err, _vars, ctx) => {
       if (ctx?.key) queryClient.setQueryData(ctx.key, ctx.prev);
       const msg = (err as Error).message;
-      if (msg === "AUTH_REQUIRED") toast.error("Sign in to follow");
+      if (msg === "AUTH_REQUIRED") toast.error(tr("Sign in to follow", "Inicia sesión para seguir"));
       else toastError(err, "feed_follow", "Could not follow");
     },
   });
@@ -235,7 +251,16 @@ function FeedPage() {
     return (
       <MobileShell fullBleed>
         <ConnectionBanner online={online} justReconnected={justReconnected} />
-        <FeedEmpty onRetry={() => feedQ.refetch()} />
+        <FeedArtFilter value={artFilter} onChange={setArtFilter} />
+        {artFilter ? (
+          <>
+            <div className="h-[100dvh] flex items-center justify-center px-8 text-center text-sm text-muted-foreground">
+              {feedQ.isFetchingNextPage ? "Looking for videos…" : `No ${artFilter} videos yet.`}
+            </div>
+          </>
+        ) : (
+          <FeedEmpty onRetry={() => feedQ.refetch()} />
+        )}
       </MobileShell>
     );
   }
@@ -243,6 +268,7 @@ function FeedPage() {
   return (
     <MobileShell fullBleed>
       <ConnectionBanner online={online} justReconnected={justReconnected} />
+      <FeedArtFilter value={artFilter} onChange={setArtFilter} />
       {hasError && (
         <FeedErrorBanner
           error={feedQ.error as Error}
@@ -281,7 +307,7 @@ function FeedPage() {
         )}
         {!feedQ.hasNextPage && feed.length > 0 && (
           <div className="h-24 flex items-center justify-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60">
-            End of feed
+            {tr("End of feed", "Fin del feed")}
           </div>
         )}
       </div>
@@ -298,6 +324,7 @@ function FeedPage() {
 }
 
 function ConnectionBanner({ online, justReconnected }: { online: boolean; justReconnected: boolean }) {
+  useLangSubscription();
   if (online && !justReconnected) return null;
   const isOffline = !online;
   return (
@@ -317,6 +344,7 @@ function ConnectionBanner({ online, justReconnected }: { online: boolean; justRe
 }
 
 function FeedSkeleton() {
+  useLangSubscription();
   return (
     <div className="h-[100dvh] w-full bg-background relative overflow-hidden">
       <Skeleton className="absolute inset-0 rounded-none bg-muted" />
@@ -344,18 +372,19 @@ function FeedSkeleton() {
 }
 
 function FeedEmpty({ onRetry }: { onRetry: () => void }) {
+  useLangSubscription();
   return (
     <div className="h-[100dvh] flex flex-col items-center justify-center px-8 text-center bg-background text-foreground">
       <Inbox className="size-12 text-muted-foreground mb-4" />
-      <h2 className="font-display text-2xl uppercase italic tracking-tight">Feed empty</h2>
+      <h2 className="font-display text-2xl uppercase italic tracking-tight">{tr("Feed empty", "Feed vacío")}</h2>
       <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-        No posts yet. Be the first to upload technique.
+        {tr("No posts yet. Be the first to upload technique.", "Aún no hay vídeos. Sé el primero en subir una técnica.")}
       </p>
       <button
         onClick={onRetry}
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-4 py-2 text-xs font-bold uppercase tracking-wide active:scale-95 transition-transform"
       >
-        <RefreshCw className="size-4" /> Reload
+        <RefreshCw className="size-4" /> {tr("Reload", "Recargar")}
       </button>
     </div>
   );
@@ -382,7 +411,7 @@ function FeedErrorBanner({
     >
       <AlertTriangle className="size-4 mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold">Couldn't refresh the feed</p>
+        <p className="text-xs font-semibold">{tr("Couldn't refresh the feed", "No se pudo actualizar el feed")}</p>
         <p className="text-[11px] opacity-90 mt-0.5">
           Showing cached content. {incidentId && <span className="font-mono">ID {incidentId}</span>}
         </p>
@@ -393,7 +422,7 @@ function FeedErrorBanner({
         className="text-[10px] font-bold uppercase tracking-wide bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-full disabled:opacity-60 flex items-center gap-1"
       >
         <RefreshCw className={`size-3 ${isRetrying ? "animate-spin" : ""}`} />
-        Retry
+        {tr("Retry", "Reintentar")}
       </button>
     </div>
   );
@@ -473,7 +502,7 @@ function FeedCard({
       )}
       {post.visibility === "private" && (
         <div className="absolute top-[max(1rem,env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-10 px-2.5 py-1 rounded-full bg-black/60 border border-white/20 text-[10px] font-mono uppercase tracking-widest text-white/80">
-          Private · only you
+          {tr("Private · only you", "Privado · solo tú")}
         </div>
       )}
       {/* Top bar */}
@@ -530,7 +559,7 @@ function FeedCard({
                 search={{ redirect: "/" }}
                 className="inline-block text-[10px] font-mono uppercase tracking-widest text-accent underline"
               >
-                Sign in to like, comment & follow
+                {tr("Sign in to like, comment & follow", "Inicia sesión para dar like, comentar y seguir")}
               </Link>
             )}
           </div>
@@ -629,7 +658,7 @@ function CommentsSheet({
     },
     onError: (err) => {
       const msg = (err as Error).message;
-      if (msg === "AUTH_REQUIRED") toast.error("Sign in to comment");
+      if (msg === "AUTH_REQUIRED") toast.error(tr("Sign in to comment", "Inicia sesión para comentar"));
       else toastError(err, "comment_add", "Could not post your comment");
     },
   });
@@ -664,7 +693,7 @@ function CommentsSheet({
     onError: (err, _v, ctx) => {
       if (ctx?.prev) queryClient.setQueryData(["comments", postId], ctx.prev);
       const msg = (err as Error).message;
-      if (msg === "AUTH_REQUIRED") toast.error("Sign in to like");
+      if (msg === "AUTH_REQUIRED") toast.error(tr("Sign in to like", "Inicia sesión para dar like"));
     },
   });
 
@@ -705,12 +734,12 @@ function CommentsSheet({
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {commentsQ.isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              <Loader2 className="size-4 animate-spin inline" /> Loading…
+              <Loader2 className="size-4 animate-spin inline" /> {tr("Loading…", "Cargando…")}
             </p>
           )}
           {commentsQ.isSuccess && top.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Be the first to drop analysis.
+              {tr("Be the first to drop analysis.", "Sé el primero en comentar.")}
             </p>
           )}
           {top.map((c) => (
@@ -734,7 +763,7 @@ function CommentsSheet({
           {replyTo && (
             <div className="flex items-center justify-between px-3 pt-2 text-[11px] font-mono text-muted-foreground">
               <span>
-                Replying to <span className="text-accent">@{replyTo.handle}</span>
+                {tr("Replying to", "Respondiendo a")} <span className="text-accent">@{replyTo.handle}</span>
               </span>
               <button
                 type="button"
@@ -744,7 +773,7 @@ function CommentsSheet({
                 }}
                 className="underline"
               >
-                Cancel
+                {tr("Cancel", "Cancelar")}
               </button>
             </div>
           )}
@@ -818,7 +847,7 @@ function CommentItem({
                 onClick={() => onReply(c.id, c.author?.handle ?? "user")}
                 className="flex items-center gap-1 text-muted-foreground"
               >
-                <ReplyIcon className="size-3" /> Reply
+                <ReplyIcon className="size-3" /> {tr("Reply", "Responder")}
               </button>
             )}
             {canDelete && (
@@ -861,6 +890,7 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 function AuthorBadge({ userId, handle, art, level }: { userId: string | null; handle: string; art: string; level: string }) {
+  useLangSubscription();
   const miniQ = useQuery({
     queryKey: ["profile-mini", userId],
     queryFn: () => fetchProfileMini(userId!),
@@ -886,5 +916,29 @@ function AuthorBadge({ userId, handle, art, level }: { userId: string | null; ha
         </p>
       </div>
     </Link>
+  );
+}
+
+function FeedArtFilter({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+  useLangSubscription();
+  const opts: (string | null)[] = [null, ...ARTS];
+  return (
+    <div className="absolute top-14 inset-x-0 z-20 flex gap-2 overflow-x-auto no-scrollbar px-4 pointer-events-auto" aria-label="Filter by martial art">
+      {opts.map((a) => {
+        const on = value === a;
+        return (
+          <button
+            key={a ?? "all"}
+            onClick={() => onChange(a)}
+            aria-pressed={on}
+            className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-bold uppercase backdrop-blur-md ${
+              on ? "bg-accent text-accent-foreground" : "bg-black/40 border border-white/15 text-white/80"
+            }`}
+          >
+            {a ?? "All"}
+          </button>
+        );
+      })}
+    </div>
   );
 }

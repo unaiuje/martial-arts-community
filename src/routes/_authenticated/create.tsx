@@ -1,3 +1,5 @@
+import { useDraft, clearDraft } from "@/hooks/use-draft";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import {
@@ -105,6 +107,7 @@ function captureCover(video: HTMLVideoElement, yOffset: number): Promise<Blob> {
 }
 
 function UploadProgressBar({ progress, label }: { progress: number; label: string }) {
+  useLangSubscription();
   const pct = Math.round(progress * 100);
   return (
     <div className="space-y-1">
@@ -140,23 +143,24 @@ function stageLabel(stage: string): string {
   }
 }
 
-const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string }[] = [
-  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip" },
-  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other" },
-  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker" },
-  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones" },
-  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone" },
+const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string; titleEs: string; descEs: string }[] = [
+  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip", titleEs: "Subir vídeo", descEs: "Comparte una técnica o clip de entreno" },
+  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other", titleEs: "Crear un duelo", descEs: "Enfrenta dos ejecuciones" },
+  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker", titleEs: "Registrar entreno", descEs: "Añade una sesión a tu tracker privado" },
+  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones", titleEs: "Fijar un objetivo", descEs: "Sigue tu progreso con metas semanales" },
+  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone", titleEs: "Publicar un logro", descEs: "Cinturón, competición, hito" },
 ];
 
 function CreatePage() {
-  const [open, setOpen] = useState<ActionKey | null>(null);
+  useLangSubscription();
+  const [open, setOpen] = useDraft<ActionKey | null>("create.open", null);
 
   return (
     <MobileShell>
       <div className="space-y-6 animate-snap-in">
         <header className="space-y-1">
-          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">New</p>
-          <h1 className="font-display text-4xl uppercase tracking-tight italic">Create</h1>
+          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">{tr("New", "Nuevo")}</p>
+          <h1 className="font-display text-4xl uppercase tracking-tight italic">{tr("Create", "Crear")}</h1>
         </header>
 
         <div className="space-y-3">
@@ -199,6 +203,7 @@ function CreatePage() {
 // ---------- shared bits ----------
 
 function FormHeader({ title, desc }: { title: string; desc: string }) {
+  useLangSubscription();
   return (
     <SheetHeader className="text-left">
       <SheetTitle className="font-display text-2xl uppercase tracking-tight italic">{title}</SheetTitle>
@@ -208,6 +213,7 @@ function FormHeader({ title, desc }: { title: string; desc: string }) {
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <label className="block space-y-1.5">
       <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{label}</span>
@@ -234,7 +240,7 @@ function FormActions({
         onClick={onCancel}
         className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-secondary text-secondary-foreground font-bold uppercase tracking-wider text-sm active:scale-[0.98] transition-transform"
       >
-        <X className="size-4" /> Cancel
+        <X className="size-4" /> {tr("Cancel", "Cancelar")}
       </button>
       <button
         type="button"
@@ -281,6 +287,7 @@ function ChipGrid<T extends string>({
 // ---------- Preview components ----------
 
 function PreviewLabel({ children }: { children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <div className="flex items-center gap-2 text-[10px] font-mono text-accent uppercase tracking-widest">
       <Eye className="size-3.5" />
@@ -290,6 +297,7 @@ function PreviewLabel({ children }: { children: React.ReactNode }) {
 }
 
 function MobilePreviewFrame({ children }: { children: React.ReactNode }) {
+  useLangSubscription();
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <div className="bg-secondary/50 px-3 py-2 border-b border-border flex items-center justify-center gap-1.5">
@@ -305,6 +313,7 @@ function MobilePreviewFrame({ children }: { children: React.ReactNode }) {
 // ---------- 1. Upload Video ----------
 
 function UploadVideoForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const user = useUser();
 
   // Local file + backend upload state
@@ -329,13 +338,13 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
   const [posterProgress, setPosterProgress] = useState(0);
   const [posterUploading, setPosterUploading] = useState(false);
 
-  const [caption, setCaption] = useState("");
-  const [art, setArt] = useState<Art | null>(null);
-  const [level, setLevel] = useState<(typeof LEVELS)[number] | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
+  const [caption, setCaption] = useDraft("create.caption", "");
+  const [art, setArt] = useDraft<Art | null>("create.art", null);
+  const [level, setLevel] = useDraft<(typeof LEVELS)[number] | null>("create.level", null);
+  const [tags, setTags] = useDraft<string[]>("create.tags", []);
+  const [tagInput, setTagInput] = useDraft("create.tagInput", "");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [selectedTechniqueIds, setSelectedTechniqueIds] = useState<string[]>([]);
+  const [selectedTechniqueIds, setSelectedTechniqueIds] = useDraft<string[]>("create.techniques", []);
   const [dragOver, setDragOver] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const techQuery = useQuery({
@@ -478,7 +487,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
         onProgress: (p) => setPosterProgress(p),
       });
       setPosterUpload(result);
-      toast.success("Cover saved");
+      toast.success(tr("Cover saved", "Portada guardada"));
     } catch (e) {
       toastError(e, "cover_upload", "Could not save the cover image");
     } finally {
@@ -521,7 +530,8 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           toast.error(`Video published but techniques failed: ${(e as Error).message}`);
         }
       }
-      toast.success("Video published to your feed");
+      clearDraft("create.open","create.caption","create.art","create.level","create.tags","create.tagInput","create.techniques");
+      toast.success(tr("Video published to your feed", "Vídeo publicado en tu feed"));
       onClose();
     } catch (e) {
       toastError(e, "post_publish", "Could not publish your video");
@@ -532,11 +542,11 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Upload Video" desc="Share a clip with the community." />
+      <FormHeader title={tr("Upload Video", "Subir vídeo")} desc={tr("Share a clip with the community.", "Comparte un clip con la comunidad.")} />
       <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
         {/* Small 9:16 preview on the left, TikTok-style */}
         <div className="space-y-1.5">
-          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Video</span>
+          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Video", "Vídeo")}</span>
           <input
             ref={videoFileRef}
             type="file"
@@ -554,7 +564,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
               className={`w-full aspect-[9/16] flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-colors ${dragOver ? "border-accent bg-accent/5" : "border-border bg-card/50"}`}
             >
               <Film className="size-6 text-accent" />
-              <p className="text-[10px] text-center font-bold uppercase tracking-wider px-2">Tap to add</p>
+              <p className="text-[10px] text-center font-bold uppercase tracking-wider px-2">{tr("Tap to add", "Toca para añadir")}</p>
               <p className="text-[9px] text-muted-foreground text-center px-2">
                 MP4 · MOV · WebM
               </p>
@@ -584,7 +594,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
                 onClick={() => videoFileRef.current?.click()}
                 className="flex-1 px-2 py-1.5 rounded-lg bg-secondary border border-border text-[10px] font-bold uppercase tracking-wide disabled:opacity-40"
               >
-                Replace
+                {tr("Replace", "Cambiar")}
               </button>
               <button
                 type="button"
@@ -606,14 +616,14 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
               value={caption}
               onChange={(e) => setCaption(e.target.value.slice(0, 220))}
               rows={4}
-              placeholder="Describe the technique, what you're drilling…"
+              placeholder={tr("Describe the technique, what you're drilling…", "Describe la técnica, qué estás practicando…")}
               className="profile-input resize-none text-sm"
             />
             <span className="text-[9px] font-mono text-muted-foreground">{caption.length}/220</span>
           </Field>
 
           <div className="space-y-1.5">
-            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Hashtags</span>
+            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Hashtags", "Hashtags")}</span>
             <div className="flex flex-wrap gap-1.5 items-center bg-secondary/40 border border-border rounded-xl px-2 py-1.5">
               {tags.map((t) => (
                 <span
@@ -678,7 +688,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-2">
             <Scissors className="size-3.5 text-accent" />
             <span className="text-[10px] font-mono text-accent uppercase tracking-widest">
-              Pick cover frame
+              {tr("Pick cover frame", "Elige la portada")}
             </span>
           </div>
           <div className="grid grid-cols-[88px_1fr] gap-3 items-start">
@@ -692,7 +702,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
             <div className="space-y-2 min-w-0">
               <label className="block space-y-1">
                 <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex justify-between">
-                  <span>Second</span>
+                  <span>{tr("Second", "Segundo")}</span>
                   <span className="text-accent">{posterSecond.toFixed(2)}s / {duration.toFixed(1)}s</span>
                 </span>
                 <input
@@ -708,7 +718,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
               </label>
               <label className="block space-y-1">
                 <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex justify-between">
-                  <span>Vertical crop</span>
+                  <span>{tr("Vertical crop", "Recorte vertical")}</span>
                   <Crop className="size-3" />
                 </span>
                 <input
@@ -731,22 +741,22 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
             className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-secondary border border-border text-xs font-bold uppercase tracking-wide disabled:opacity-40"
           >
             {posterUpload ? (
-              <><CheckCircle2 className="size-4 text-accent" /> Cover saved · update</>
+              <><CheckCircle2 className="size-4 text-accent" /> {tr("Cover saved · update", "Portada guardada · actualizar")}</>
             ) : posterUploading ? (
-              <><Loader2 className="size-4 animate-spin" /> Saving…</>
+              <><Loader2 className="size-4 animate-spin" /> {tr("Saving…", "Guardando…")}</>
             ) : (
-              <><Check className="size-4" /> Use this cover</>
+              <><Check className="size-4" /> {tr("Use this cover", "Usar esta portada")}</>
             )}
           </button>
         </div>
       )}
 
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Discipline</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Discipline", "Disciplina")}</span>
         <ChipGrid options={ARTS} value={art} onChange={setArt} />
       </div>
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Level</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Level", "Nivel")}</span>
         <ChipGrid options={LEVELS} value={level} onChange={setLevel} />
       </div>
 
@@ -756,7 +766,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
             BJJ Techniques (optional, up to 3)
           </span>
           {techQuery.isLoading ? (
-            <p className="text-xs text-muted-foreground">Loading techniques…</p>
+            <p className="text-xs text-muted-foreground">{tr("Loading techniques…", "Cargando técnicas…")}</p>
           ) : (
             <div className="max-h-48 overflow-y-auto rounded-xl border border-border bg-card/50 p-2 space-y-1">
               {Object.entries(
@@ -809,7 +819,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
       )}
 
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Visibility</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Visibility", "Visibilidad")}</span>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
@@ -822,9 +832,9 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           >
             <div className="flex items-center gap-2">
               <Eye className="size-4" />
-              <p className="font-bold text-xs uppercase tracking-wide">Public</p>
+              <p className="font-bold text-xs uppercase tracking-wide">{tr("Public", "Público")}</p>
             </div>
-            <p className="text-[10px] mt-1">Anyone can see this in the feed.</p>
+            <p className="text-[10px] mt-1">{tr("Anyone can see this in the feed.", "Cualquiera puede verlo en el feed.")}</p>
           </button>
           <button
             type="button"
@@ -837,9 +847,9 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           >
             <div className="flex items-center gap-2">
               <Trash2 className="size-4 hidden" />
-              <p className="font-bold text-xs uppercase tracking-wide">Only me</p>
+              <p className="font-bold text-xs uppercase tracking-wide">{tr("Only me", "Solo yo")}</p>
             </div>
-            <p className="text-[10px] mt-1">Saved to your profile, hidden from others.</p>
+            <p className="text-[10px] mt-1">{tr("Saved to your profile, hidden from others.", "Guardado en tu perfil, oculto para los demás.")}</p>
           </button>
         </div>
       </div>
@@ -872,6 +882,7 @@ function VideoPreview({
   level: string;
   poster?: string;
 }) {
+  useLangSubscription();
   return (
     <div className="relative aspect-[9/16] bg-black overflow-hidden">
       <div
@@ -907,10 +918,10 @@ function VideoPreview({
               <div className="size-8 rounded-full border-2 border-accent overflow-hidden bg-secondary" />
               <div>
                 <p className="font-semibold text-xs tracking-tight text-white">{handle}</p>
-                <p className="text-[9px] font-mono text-accent uppercase">You</p>
+                <p className="text-[9px] font-mono text-accent uppercase">{tr("You", "Tú")}</p>
               </div>
               <button className="ml-1 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide bg-accent text-accent-foreground">
-                Follow
+                {tr("Follow", "Seguir")}
               </button>
             </div>
             <p className="text-xs font-medium leading-snug text-white text-pretty line-clamp-3">
@@ -943,13 +954,13 @@ function VideoPreview({
               <div className="size-9 rounded-full backdrop-blur-md border border-white/10 bg-white/5 flex items-center justify-center text-white">
                 <Bookmark className="size-4" />
               </div>
-              <span className="text-[9px] font-mono text-white">Save</span>
+              <span className="text-[9px] font-mono text-white">{tr("Save", "Guardar")}</span>
             </div>
             <div className="flex flex-col items-center gap-0.5">
               <div className="size-9 rounded-full backdrop-blur-md border border-white/10 bg-white/5 flex items-center justify-center text-white">
                 <Share2 className="size-4" />
               </div>
-              <span className="text-[9px] font-mono text-white">Share</span>
+              <span className="text-[9px] font-mono text-white">{tr("Share", "Compartir")}</span>
             </div>
           </div>
         </div>
@@ -961,12 +972,13 @@ function VideoPreview({
 // ---------- 2. Start a Duel ----------
 
 function DuelForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const user = useUser();
   const myHandle = user?.username ? `@${user.username}` : "@you";
-  const [title, setTitle] = useState("");
-  const [technique, setTechnique] = useState("");
+  const [title, setTitle] = useDraft("duel.title", "");
+  const [technique, setTechnique] = useDraft("duel.technique", "");
   const [aHandle, setAHandle] = useState(myHandle);
-  const [bHandle, setBHandle] = useState("");
+  const [bHandle, setBHandle] = useDraft("duel.bHandle", "");
   const [a, setA] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [b, setB] = useState<{ local: string; upload: UploadResult | null; progress: number; uploading: boolean }>({ local: "", upload: null, progress: 0, uploading: false });
   const [publishing, setPublishing] = useState(false);
@@ -979,7 +991,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
   ) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (!f.type.startsWith("image/")) { toast.error("That file is not an image"); return; }
+    if (!f.type.startsWith("image/")) { toast.error(tr("That file is not an image", "Ese archivo no es una imagen")); return; }
     const mb = f.size / (1024 * 1024);
     if (mb > MAX_IMAGE_MB) { toast.error(`Image too large (${mb.toFixed(1)}MB). Max ${MAX_IMAGE_MB}MB.`); return; }
 
@@ -1035,7 +1047,8 @@ function DuelForm({ onClose }: { onClose: () => void }) {
         aPosterPath: a.upload.path,
         bPosterPath: b.upload.path,
       });
-      toast.success("Duel started — voting is live");
+      clearDraft("duel.title","duel.technique","duel.bHandle");
+      toast.success(tr("Duel started — voting is live", "Duelo creado — la votación está abierta"));
       onClose();
     } catch (e) {
       toastError(e, "duel_create", "Could not start the duel");
@@ -1046,16 +1059,16 @@ function DuelForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Start a Duel" desc="Pit two executions head-to-head." />
+      <FormHeader title={tr("Start a Duel", "Crear un duelo")} desc={tr("Pit two executions head-to-head.", "Enfrenta dos ejecuciones cara a cara.")} />
       <Field label="Title">
-        <input value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))} placeholder="Which armbar is cleaner?" className="profile-input" />
+        <input value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))} placeholder={tr("Which armbar is cleaner?", "¿Qué armbar es más limpio?")} className="profile-input" />
       </Field>
       <Field label="Technique">
-        <input value={technique} onChange={(e) => setTechnique(e.target.value.slice(0, 60))} placeholder="Armbar from guard" className="profile-input" />
+        <input value={technique} onChange={(e) => setTechnique(e.target.value.slice(0, 60))} placeholder={tr("Armbar from guard", "Armbar desde guardia")} className="profile-input" />
       </Field>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">Fighter A</p>
+          <p className="text-[10px] font-mono text-accent uppercase tracking-widest">{tr("Fighter A", "Luchador A")}</p>
           <input value={aHandle} onChange={(e) => setAHandle(e.target.value)} placeholder="@handle" className="profile-input" />
           <FighterImagePicker
             value={a.local}
@@ -1068,7 +1081,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
           <input ref={aRef} type="file" accept="image/*" className="hidden" onChange={(e) => pickImage(e, "a")} />
         </div>
         <div className="space-y-2">
-          <p className="text-[10px] font-mono text-primary uppercase tracking-widest">Fighter B</p>
+          <p className="text-[10px] font-mono text-primary uppercase tracking-widest">{tr("Fighter B", "Luchador B")}</p>
           <input value={bHandle} onChange={(e) => setBHandle(e.target.value)} placeholder="@handle" className="profile-input" />
           <FighterImagePicker
             value={b.local}
@@ -1083,7 +1096,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-2">
-        <PreviewLabel>Duel Preview</PreviewLabel>
+        <PreviewLabel>{tr("Duel Preview", "Vista previa del duelo")}</PreviewLabel>
         <MobilePreviewFrame>
           <DuelPreview
             title={title || "Duel title preview"}
@@ -1159,7 +1172,7 @@ function FighterImagePicker({
               onClick={onClear}
               className="text-[9px] font-mono text-muted-foreground uppercase tracking-wide text-left"
             >
-              Remove
+              {tr("Remove", "Quitar")}
             </button>
           )}
         </div>
@@ -1180,6 +1193,7 @@ function DuelPreview({
   a: { handle: string; poster?: string };
   b: { handle: string; poster?: string };
 }) {
+  useLangSubscription();
   const fallback = "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=800";
   return (
     <div className="p-4 space-y-3 bg-background">
@@ -1193,7 +1207,7 @@ function DuelPreview({
           <img src={a.poster || fallback} alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10" />
           <div className="absolute top-2 left-2 px-2 py-1 text-[9px] font-bold uppercase italic tracking-tighter bg-accent text-accent-foreground rounded">
-            Fighter A
+            {tr("Fighter A", "Luchador A")}
           </div>
           <div className="absolute inset-x-0 bottom-0 p-2.5 space-y-0.5">
             <p className="text-xs font-semibold text-white">{a.handle}</p>
@@ -1203,7 +1217,7 @@ function DuelPreview({
           <img src={b.poster || fallback} alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10" />
           <div className="absolute top-2 left-2 px-2 py-1 text-[9px] font-bold uppercase italic tracking-tighter bg-primary text-primary-foreground rounded">
-            Fighter B
+            {tr("Fighter B", "Luchador B")}
           </div>
           <div className="absolute inset-x-0 bottom-0 p-2.5 space-y-0.5">
             <p className="text-xs font-semibold text-white">{b.handle}</p>
@@ -1229,13 +1243,14 @@ function DuelPreview({
 // ---------- 3. Log Training ----------
 
 function TrainingForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [art, setArt] = useState<Art | null>(null);
   const [duration, setDuration] = useState("60");
   const [effort, setEffort] = useState(7);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useDraft("createSession.notes", "");
   const [completed, setCompleted] = useState(true);
 
   const valid = !!date && !!art && Number(duration) > 0;
@@ -1258,7 +1273,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Log Training" desc="Add a session to your private tracker." />
+      <FormHeader title={tr("Log Training", "Registrar entreno")} desc={tr("Add a session to your private tracker.", "Añade una sesión a tu tracker privado.")} />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Date">
           <input type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} className="profile-input" />
@@ -1273,7 +1288,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
         </Field>
       </div>
       <div className="space-y-2">
-        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Discipline</span>
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{tr("Discipline", "Disciplina")}</span>
         <ChipGrid options={ARTS} value={art} onChange={setArt} />
       </div>
       <Field label={`Effort · ${effort}/10`}>
@@ -1291,7 +1306,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
           value={notes}
           onChange={(e) => setNotes(e.target.value.slice(0, 280))}
           rows={3}
-          placeholder="Drilled kimura entries…"
+          placeholder={tr("Drilled kimura entries…", "Entradas a kimura…")}
           className="profile-input resize-none"
         />
       </Field>
@@ -1314,7 +1329,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="space-y-2">
-        <PreviewLabel>Tracker Preview</PreviewLabel>
+        <PreviewLabel>{tr("Tracker Preview", "Vista previa del tracker")}</PreviewLabel>
         <MobilePreviewFrame>
           <TrainingPreview
             date={date}
@@ -1347,6 +1362,7 @@ function TrainingPreview({
   notes?: string;
   completed: boolean;
 }) {
+  useLangSubscription();
   const d = new Date(date);
   return (
     <div className="p-4 bg-background space-y-2">
@@ -1383,9 +1399,10 @@ function TrainingPreview({
 // ---------- 4. Set a Goal ----------
 
 function GoalForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [target, setTarget] = useState("");
+  const [title, setTitle] = useDraft("goal.title", "");
+  const [target, setTarget] = useDraft("goal.target", "");
   const [progress, setProgress] = useState(0);
 
   const valid = !!title.trim() && !!target.trim();
@@ -1393,7 +1410,8 @@ function GoalForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addGoal({ title: title.trim(), target: target.trim(), progress });
-    toast.success("Goal added", {
+    clearDraft("goal.title","goal.target");
+    toast.success(tr("Goal added", "Objetivo añadido"), {
       action: { label: "Open tracker", onClick: () => navigate({ to: "/tracker" }) },
     });
     onClose();
@@ -1401,12 +1419,12 @@ function GoalForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Set a Goal" desc="Track weekly or long-term milestones." />
+      <FormHeader title={tr("Set a Goal", "Fijar un objetivo")} desc={tr("Track weekly or long-term milestones.", "Sigue metas semanales o a largo plazo.")} />
       <Field label="Goal">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value.slice(0, 80))}
-          placeholder="Train 4× per week"
+          placeholder={tr("Train 4× per week", "Entrenar 4× por semana")}
           className="profile-input"
         />
       </Field>
@@ -1414,7 +1432,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
         <input
           value={target}
           onChange={(e) => setTarget(e.target.value.slice(0, 60))}
-          placeholder="4 sessions / week"
+          placeholder={tr("4 sessions / week", "4 sesiones / semana")}
           className="profile-input"
         />
       </Field>
@@ -1430,7 +1448,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
       </Field>
 
       <div className="space-y-2">
-        <PreviewLabel>Goal Preview</PreviewLabel>
+        <PreviewLabel>{tr("Goal Preview", "Vista previa del objetivo")}</PreviewLabel>
         <MobilePreviewFrame>
           <GoalPreview title={title || "Your goal title"} target={target || "Target description"} progress={progress} />
         </MobilePreviewFrame>
@@ -1442,6 +1460,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
 }
 
 function GoalPreview({ title, target, progress }: { title: string; target: string; progress: number }) {
+  useLangSubscription();
   return (
     <div className="p-4 bg-background">
       <div className="bg-card border border-border rounded-xl p-4 space-y-2.5">
@@ -1464,10 +1483,11 @@ function GoalPreview({ title, target, progress }: { title: string; target: strin
 // ---------- 5. Post Achievement ----------
 
 function AchievementForm({ onClose }: { onClose: () => void }) {
+  useLangSubscription();
   const today = new Date().toISOString().slice(0, 10);
   const [kind, setKind] = useState<"promotion" | "competition" | "milestone">("promotion");
-  const [title, setTitle] = useState("");
-  const [detail, setDetail] = useState("");
+  const [title, setTitle] = useDraft("achievement.title", "");
+  const [detail, setDetail] = useDraft("achievement.detail", "");
   const [date, setDate] = useState(today);
 
   const valid = !!title.trim() && !!date;
@@ -1475,7 +1495,8 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addAchievement({ kind, title: title.trim(), detail: detail.trim() || undefined, date });
-    toast.success("Achievement posted");
+    clearDraft("achievement.title","achievement.detail");
+    toast.success(tr("Achievement posted", "Logro publicado"));
     onClose();
   };
 
@@ -1487,7 +1508,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Post Achievement" desc="Belt promotion, competition, or milestone." />
+      <FormHeader title={tr("Post Achievement", "Publicar logro")} desc={tr("Belt promotion, competition, or milestone.", "Cinturón, competición o hito.")} />
       <div className="flex gap-2">
         {kinds.map((k) => {
           const sel = kind === k.id;
@@ -1518,7 +1539,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
           value={detail}
           onChange={(e) => setDetail(e.target.value.slice(0, 220))}
           rows={3}
-          placeholder="Where, who promoted you, or notes…"
+          placeholder={tr("Where, who promoted you, or notes…", "Dónde, quién te ascendió o notas…")}
           className="profile-input resize-none"
         />
       </Field>
@@ -1527,7 +1548,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
       </Field>
 
       <div className="space-y-2">
-        <PreviewLabel>Achievement Preview</PreviewLabel>
+        <PreviewLabel>{tr("Achievement Preview", "Vista previa del logro")}</PreviewLabel>
         <MobilePreviewFrame>
           <AchievementPreview kind={kind} title={title || "Achievement title"} detail={detail || undefined} date={date} />
         </MobilePreviewFrame>
@@ -1549,6 +1570,7 @@ function AchievementPreview({
   detail?: string;
   date: string;
 }) {
+  useLangSubscription();
   const icons = {
     promotion: <TrendingUp className="size-5 text-accent" />,
     competition: <Trophy className="size-5 text-accent" />,
@@ -1579,7 +1601,7 @@ function AchievementPreview({
           </span>
           <div className="flex items-center gap-1">
             <Flame className="size-3 text-accent" />
-            <span className="text-[9px] font-mono text-accent">Achievement</span>
+            <span className="text-[9px] font-mono text-accent">{tr("Achievement", "Logro")}</span>
           </div>
         </div>
       </div>
@@ -1588,6 +1610,7 @@ function AchievementPreview({
 }
 
 function FormStyles() {
+  useLangSubscription();
   return (
     <style>{`
       .profile-input {

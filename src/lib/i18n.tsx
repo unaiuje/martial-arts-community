@@ -183,6 +183,17 @@ export type TKey = keyof (typeof dict)["en"];
 
 const KEY = "strive-lang";
 
+let currentLang: Lang = "en";
+/** Bilingual string usable anywhere (components, toasts): tr("English", "Español"). */
+/** Subscribe a component to language changes so its tr() calls re-render without losing state. */
+export function useLangSubscription() {
+  return useContext(I18nCtx).lang;
+}
+
+export function tr(en: string, es: string): string {
+  return currentLang === "es" ? es : en;
+}
+
 function readLang(): Lang {
   if (typeof window === "undefined") return "en";
   const v = localStorage.getItem(KEY);
@@ -209,6 +220,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   };
   const t = (k: TKey) => dict[lang][k] ?? dict.en[k] ?? k;
+  currentLang = lang;
   return <I18nCtx.Provider value={{ lang, setLang, t }}>{children}</I18nCtx.Provider>;
 }
 
@@ -218,4 +230,9 @@ export function useI18n() {
 
 export function useT() {
   return useContext(I18nCtx).t;
+}
+/** Inline bilingual helper: tr("English", "Español"). */
+export function useTr() {
+  const { lang } = useContext(I18nCtx);
+  return (en: string, es: string) => (lang === "es" ? es : en);
 }

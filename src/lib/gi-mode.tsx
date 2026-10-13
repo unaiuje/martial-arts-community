@@ -1,4 +1,9 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { toastError } from "@/lib/errors";
+import { useIsAdmin } from "@/lib/admin";
 
 export type GiMode = "all" | "gi" | "nogi";
 const KEY = "strive-gi-mode";
@@ -47,10 +52,45 @@ export function GiToggle({ mode, onChange }: { mode: GiMode; onChange: (m: GiMod
 }
 
 export function GiBadge({ mode }: { mode: string | null | undefined }) {
-  if (!mode || mode === "both") return null;
+  const m = mode ?? "both";
+  const label = m === "gi" ? "Gi" : m === "nogi" ? "No-Gi" : "Gi · No-Gi";
   return (
-    <span className="ml-1.5 rounded-full border border-accent/50 px-1.5 py-px text-[9px] font-bold uppercase text-accent">
-      {mode === "gi" ? "Gi" : "No-Gi"}
+    <span className={`ml-1.5 rounded-full border px-1.5 py-px text-[9px] font-bold uppercase whitespace-nowrap ${
+      m === "both" ? "border-border text-muted-foreground" : "border-accent/50 text-accent"
+    }`}>
+      {label}
     </span>
+  );
+}
+
+/** Admin-only control to correct a technique's Gi / No-Gi classification. */
+export function GiEditor({ techniqueId, mode }: { techniqueId: string; mode: string | null | undefined }) {
+  const isAdmin = useIsAdmin();
+  const qc = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  if (!isAdmin) return null;
+  async function save(v: string) {
+    setSaving(true);
+    const { error } = await supabase.from("techniques").update({ gi_mode: v }).eq("id", techniqueId);
+    setSaving(false);
+    if (error) return toastError(error, "gi_mode_update");
+    toast.success("Classification saved");
+    qc.invalidateQueries({ queryKey: ["technique"] });
+    qc.invalidateQueries({ queryKey: ["technique-category"] });
+    qc.invalidateQueries({ queryKey: ["all-techniques"] });
+  }
+  return (
+    <select
+      aria-label="Gi or No-Gi classification"
+      value={mode ?? "both"}
+      disabled={saving}
+      onClick={(e) => e.stopPropagation()}
+      onChange={(e) => save(e.target.value)}
+      className="text-[11px] font-bold uppercase rounded-lg bg-secondary border border-border px-2 py-1"
+    >
+      <option value="both">Gi · No-Gi</option>
+      <option value="gi">Gi only</option>
+      <option value="nogi">No-Gi only</option>
+    </select>
   );
 }

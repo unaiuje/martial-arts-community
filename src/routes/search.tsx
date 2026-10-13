@@ -1,3 +1,6 @@
+import { useDraft } from "@/hooks/use-draft";
+import { AiVideoFinder } from "@/components/AiVideoFinder";
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, ChevronRight } from "lucide-react";
@@ -20,9 +23,10 @@ export const Route = createFileRoute("/search")({
 });
 
 function SearchPage() {
-  const [q, setQ] = useState("");
+  useLangSubscription();
+  const [q, setQ] = useDraft("search.q", "");
   const [art, setArt] = useState<string | null>(null);
-  const [tab, setTab] = useState<"videos" | "techniques">("videos");
+  const [tab, setTab] = useState<"videos" | "techniques" | "ai">("videos");
   const userPosts = useStore((s) => s.userPosts);
 
   const results = useMemo(() => {
@@ -76,29 +80,32 @@ function SearchPage() {
       <div className="space-y-6 animate-snap-in">
         <header className="space-y-3">
           <div className="flex items-center justify-between">
-            <h1 className="font-display text-4xl uppercase tracking-tight italic">Search</h1>
+            <h1 className="font-display text-4xl uppercase tracking-tight italic">{tr("Search", "Buscar")}</h1>
             <Link to="/suggestions" className="text-[11px] font-bold uppercase px-3 py-1.5 rounded-full bg-secondary border border-border text-muted-foreground hover:text-foreground">
-              💡 Suggest
+              💡 {tr("Suggest", "Sugerir")}
             </Link>
           </div>
-          <div className="relative">
+          {tab !== "ai" && <div className="relative">
             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder={tab === "techniques" ? "kimura, half guard, heel hook…" : "Try: kimura from half guard"}
+              placeholder={tab === "techniques" ? "kimura, half guard, heel hook…" : tr("Try: kimura from half guard", "Prueba: kimura desde media guardia")}
               className="w-full bg-secondary/60 border border-border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
             />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Chip active={tab === "videos"} onClick={() => setTab("videos")} label="Videos" />
-            <Chip active={tab === "techniques"} onClick={() => setTab("techniques")} label="BJJ Techniques" />
+          </div>}
+          <div className="grid grid-cols-3 gap-2">
+            <Chip active={tab === "videos"} onClick={() => setTab("videos")} label={tr("Videos", "Vídeos")} />
+            <Chip active={tab === "techniques"} onClick={() => setTab("techniques")} label={tr("BJJ Techniques", "Técnicas BJJ")} />
+            <Chip active={tab === "ai"} onClick={() => setTab("ai")} label={tr("✨ AI", "✨ IA")} />
           </div>
         </header>
 
+        {tab === "ai" && <AiVideoFinder />}
+
         {tab === "videos" && (
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
-            <Chip active={art === null} onClick={() => setArt(null)} label="All" />
+            <Chip active={art === null} onClick={() => setArt(null)} label={tr("All", "Todo")} />
             {ARTS.map((a) => (
               <Chip key={a} active={art === a} onClick={() => setArt(a)} label={a} />
             ))}
@@ -122,13 +129,13 @@ function SearchPage() {
               <div className="absolute inset-x-0 bottom-0 p-3 space-y-1">
                 <p className="text-[10px] font-mono text-accent uppercase">{p.art}</p>
                 <p className="text-xs font-semibold leading-tight line-clamp-2">{p.caption}</p>
-                <p className="text-[10px] text-white/60 font-mono">{formatCount(p.likes)} likes</p>
+                <p className="text-[10px] text-white/60 font-mono">{formatCount(p.likes)} {tr("likes", "likes")}</p>
               </div>
             </article>
           ))}
           {results.length === 0 && (
             <p className="col-span-2 text-center text-sm text-muted-foreground py-12">
-              No results. Try a different technique.
+              {tr("No results. Try a different technique.", "Sin resultados. Prueba otra técnica.")}
             </p>
           )}
           </section>
@@ -140,11 +147,11 @@ function SearchPage() {
             {q.trim() ? (
               <div className="space-y-2">
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                  Matches ({techMatches.length})
+                  {tr("Matches", "Resultados")} ({techMatches.length})
                 </p>
                 {techMatches.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-4">
-                    No techniques match "{q}".
+                    {tr("No techniques match", "Ninguna técnica coincide con")} "{q}".
                   </p>
                 ) : (
                   <ul className="space-y-2">
@@ -174,7 +181,7 @@ function SearchPage() {
                 {(coachesQ.data ?? []).length > 0 && (
                   <div className="space-y-2 pb-2">
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                      BJJ Coaches
+                      {tr("BJJ Coaches", "Entrenadores de BJJ")}
                     </p>
                     <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5">
                       {coachesQ.data!.map((c) => (
@@ -197,10 +204,10 @@ function SearchPage() {
                   </div>
                 )}
                 <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                  Categories
+                  {tr("Categories", "Categorías")}
                 </p>
                 {categoriesQ.isLoading ? (
-                  <p className="text-sm text-muted-foreground">Loading…</p>
+                  <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>
                 ) : (
                   <ul className="space-y-2">
                     {(categoriesQ.data ?? []).map((c) => (
@@ -232,6 +239,7 @@ function SearchPage() {
 }
 
 function Chip({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  useLangSubscription();
   return (
     <button
       onClick={onClick}

@@ -29,6 +29,13 @@
       "when": 1791281681085,
       "tag": "0003_suggestions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791370981748,
+      "tag": "0004_roles_storage_owner_admin_edits",
+      "breakpoints": true
     }
   ]
 }

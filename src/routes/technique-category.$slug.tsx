@@ -1,9 +1,10 @@
+import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
 import { fetchCategoryBySlug } from "@/lib/techniques";
-import { GiBadge, GiToggle, matchesGiMode, useGiMode } from "@/lib/gi-mode";
+import { GiBadge, GiEditor, GiToggle, matchesGiMode, useGiMode } from "@/lib/gi-mode";
 
 export const Route = createFileRoute("/technique-category/$slug")({
   head: ({ params }) => ({
@@ -16,10 +17,11 @@ export const Route = createFileRoute("/technique-category/$slug")({
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">{error instanceof Error ? error.message : String(error)}</div>
   ),
-  notFoundComponent: () => <div className="p-6 text-sm">Category not found.</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{tr("Category not found.", "Categoría no encontrada.")}</div>,
 });
 
 function CategoryPage() {
+  useLangSubscription();
   const { slug } = Route.useParams();
   const router = useRouter();
   const [giMode, setGiMode] = useGiMode();
@@ -35,12 +37,12 @@ function CategoryPage() {
           onClick={() => router.history.back()}
           className="flex items-center gap-1.5 text-xs text-muted-foreground"
         >
-          <ArrowLeft className="size-3.5" /> Back
+          <ArrowLeft className="size-3.5" /> {tr("Back", "Volver")}
         </button>
         {isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">{tr("Loading…", "Cargando…")}</p>
         ) : !data ? (
-          <p className="text-sm text-muted-foreground">Category not found.</p>
+          <p className="text-sm text-muted-foreground">{tr("Category not found.", "Categoría no encontrada.")}</p>
         ) : (
           <>
             <header className="space-y-1">
@@ -56,11 +58,11 @@ function CategoryPage() {
                 .filter((t) => matchesGiMode(t.gi_mode, giMode))
                 .sort((a, b) => a.sort_order - b.sort_order)
                 .map((t) => (
-                  <li key={t.id}>
+                  <li key={t.id} className="flex items-center gap-2">
                     <Link
                       to="/technique/$slug"
                       params={{ slug: t.slug }}
-                      className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border hover:border-accent/40"
+                      className="flex-1 flex items-center justify-between p-4 rounded-2xl bg-card border border-border hover:border-accent/40"
                     >
                       <div>
                         <p className="font-semibold text-sm">{t.name}<GiBadge mode={t.gi_mode} /></p>
@@ -71,6 +73,7 @@ function CategoryPage() {
                       </div>
                       <ChevronRight className="size-4 text-muted-foreground" />
                     </Link>
+                    <GiEditor techniqueId={t.id} mode={t.gi_mode} />
                   </li>
                 ))}
             </ul>
