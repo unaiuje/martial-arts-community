@@ -143,17 +143,17 @@ function stageLabel(stage: string): string {
   }
 }
 
-const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string }[] = [
-  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip" },
-  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other" },
-  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker" },
-  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones" },
-  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone" },
+const ACTION_LIST: { key: ActionKey; icon: typeof Upload; title: string; desc: string; titleEs: string; descEs: string }[] = [
+  { key: "video", icon: Upload, title: "Upload Video", desc: "Share a technique or training clip", titleEs: "Subir vídeo", descEs: "Comparte una técnica o clip de entreno" },
+  { key: "duel", icon: Swords, title: "Start a Duel", desc: "Pit two executions against each other", titleEs: "Crear un duelo", descEs: "Enfrenta dos ejecuciones" },
+  { key: "training", icon: CalendarPlus, title: "Log Training", desc: "Add a session to your private tracker", titleEs: "Registrar entreno", descEs: "Añade una sesión a tu tracker privado" },
+  { key: "goal", icon: Target, title: "Set a Goal", desc: "Track progress with weekly milestones", titleEs: "Fijar un objetivo", descEs: "Sigue tu progreso con metas semanales" },
+  { key: "achievement", icon: Trophy, title: "Post an Achievement", desc: "Belt promotion, competition, milestone", titleEs: "Publicar un logro", descEs: "Cinturón, competición, hito" },
 ];
 
 function CreatePage() {
   useLangSubscription();
-  const [open, setOpen] = useState<ActionKey | null>(null);
+  const [open, setOpen] = useDraft<ActionKey | null>("create.open", null);
 
   return (
     <MobileShell>
@@ -530,7 +530,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           toast.error(`Video published but techniques failed: ${(e as Error).message}`);
         }
       }
-      clearDraft("create.caption","create.art","create.level","create.tags","create.tagInput","create.techniques");
+      clearDraft("create.open","create.caption","create.art","create.level","create.tags","create.tagInput","create.techniques");
       toast.success(tr("Video published to your feed", "Vídeo publicado en tu feed"));
       onClose();
     } catch (e) {
@@ -542,7 +542,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Upload Video" desc="Share a clip with the community." />
+      <FormHeader title={tr("Upload Video", "Subir vídeo")} desc={tr("Share a clip with the community.", "Comparte un clip con la comunidad.")} />
       <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
         {/* Small 9:16 preview on the left, TikTok-style */}
         <div className="space-y-1.5">
@@ -1059,7 +1059,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Start a Duel" desc="Pit two executions head-to-head." />
+      <FormHeader title={tr("Start a Duel", "Crear un duelo")} desc={tr("Pit two executions head-to-head.", "Enfrenta dos ejecuciones cara a cara.")} />
       <Field label="Title">
         <input value={title} onChange={(e) => setTitle(e.target.value.slice(0, 80))} placeholder={tr("Which armbar is cleaner?", "¿Qué armbar es más limpio?")} className="profile-input" />
       </Field>
@@ -1273,7 +1273,7 @@ function TrainingForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Log Training" desc="Add a session to your private tracker." />
+      <FormHeader title={tr("Log Training", "Registrar entreno")} desc={tr("Add a session to your private tracker.", "Añade una sesión a tu tracker privado.")} />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Date">
           <input type="date" value={date} max={today} onChange={(e) => setDate(e.target.value)} className="profile-input" />
@@ -1419,7 +1419,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Set a Goal" desc="Track weekly or long-term milestones." />
+      <FormHeader title={tr("Set a Goal", "Fijar un objetivo")} desc={tr("Track weekly or long-term milestones.", "Sigue metas semanales o a largo plazo.")} />
       <Field label="Goal">
         <input
           value={title}
@@ -1508,7 +1508,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-5 pb-6">
-      <FormHeader title="Post Achievement" desc="Belt promotion, competition, or milestone." />
+      <FormHeader title={tr("Post Achievement", "Publicar logro")} desc={tr("Belt promotion, competition, or milestone.", "Cinturón, competición o hito.")} />
       <div className="flex gap-2">
         {kinds.map((k) => {
           const sel = kind === k.id;
