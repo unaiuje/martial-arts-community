@@ -1,4 +1,4 @@
-import { useDraft } from "@/hooks/use-draft";
+import { useDraft, clearDraft } from "@/hooks/use-draft";
 import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
@@ -606,6 +606,7 @@ function AddSessionSheet({ onClose, initialDate }: { onClose: () => void; initia
       toast.error(tr("Strava link must start with http(s)://", "El enlace de Strava debe empezar por http(s)://"));
       return;
     }
+    clearDraft("tracker.notes", "tracker.activity", "tracker.strava");
     actions.addSession({
       art,
       durationMin: duration,
