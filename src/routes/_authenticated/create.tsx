@@ -1,4 +1,4 @@
-import { useDraft } from "@/hooks/use-draft";
+import { useDraft, clearDraft } from "@/hooks/use-draft";
 import { tr, useLangSubscription } from "@/lib/i18n";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
@@ -530,6 +530,7 @@ function UploadVideoForm({ onClose }: { onClose: () => void }) {
           toast.error(`Video published but techniques failed: ${(e as Error).message}`);
         }
       }
+      clearDraft("create.caption","create.art","create.level","create.tags","create.tagInput","create.techniques");
       toast.success(tr("Video published to your feed", "Vídeo publicado en tu feed"));
       onClose();
     } catch (e) {
@@ -1046,6 +1047,7 @@ function DuelForm({ onClose }: { onClose: () => void }) {
         aPosterPath: a.upload.path,
         bPosterPath: b.upload.path,
       });
+      clearDraft("duel.title","duel.technique","duel.bHandle");
       toast.success(tr("Duel started — voting is live", "Duelo creado — la votación está abierta"));
       onClose();
     } catch (e) {
@@ -1408,6 +1410,7 @@ function GoalForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addGoal({ title: title.trim(), target: target.trim(), progress });
+    clearDraft("goal.title","goal.target");
     toast.success(tr("Goal added", "Objetivo añadido"), {
       action: { label: "Open tracker", onClick: () => navigate({ to: "/tracker" }) },
     });
@@ -1492,6 +1495,7 @@ function AchievementForm({ onClose }: { onClose: () => void }) {
   const submit = () => {
     if (!valid) return;
     storeActions.addAchievement({ kind, title: title.trim(), detail: detail.trim() || undefined, date });
+    clearDraft("achievement.title","achievement.detail");
     toast.success(tr("Achievement posted", "Logro publicado"));
     onClose();
   };

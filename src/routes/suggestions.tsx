@@ -1,4 +1,4 @@
-import { useDraft } from "@/hooks/use-draft";
+import { useDraft, clearDraft } from "@/hooks/use-draft";
 import { useTr } from "@/lib/i18n";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -84,6 +84,7 @@ function SuggestionsPage() {
       if (error) throw error;
       setTitle("");
       setBody("");
+      clearDraft("suggestion.title","suggestion.body");
       toast.success(tr("Thanks! Suggestion posted", "¡Gracias! Sugerencia publicada"));
       refresh();
     } catch (err) {
